@@ -1,0 +1,11 @@
+## Title: Bank Manager - By |c3366FF@Todo|r
+## APIVersion: 100003
+## Description: Manage easily your bank! 
+## SavedVariables: BMVars
+
+Libs/LibStub/LibStub.lua
+Libs/LibAddonMenu-1.0(BankManager)/LibAddonMenu-1.0(BankManager).lua
+
+ItemsTranslation.lua
+Language.lua
+BankManager.lua
