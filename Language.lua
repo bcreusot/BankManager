@@ -8,13 +8,13 @@ language = {
 		title							= "Bank Manager",
 		reloadWarning					= "The UI will reload",
 		
-		dropDownLangageText				= "Langage",
-		dropDownLangageTooltip			= "Select your langage",
+		dropDownLanguageText			= "Language",
+		dropDownLanguageTooltip			= "Select your language",
 		
 		spamChatText					= "Chat Spam",
 		spamChatTooltip					= "Display moved items in the chat",
 		
-		AllBM      						= "Send all",
+		AllBM      						= "All items",
 		
 		NOTHING	 						= "Nothing",
 		BANK_TO_INVENTORY				= "Pull to Inventory",
@@ -65,8 +65,8 @@ language = {
 		title							= "Bank Manager",
 		reloadWarning					= "L'affichage va recharger",
 
-		dropDownLangageText				= "Langue",
-		dropDownLangageTooltip			= "Selectionnez votre langue",
+		dropDownLanguageText			= "Langue",
+		dropDownLanguageTooltip			= "Selectionnez votre langue",
 
 		spamChatText					= "Spam du chat",
 		spamChatTooltip					= "Affiche les items deplacés dans le chat",
