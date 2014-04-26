@@ -71,7 +71,7 @@ language = {
 		spamChatText					= "Spam du chat",
 		spamChatTooltip					= "Affiche les items deplacés dans le chat",
 
-		All 							= "Envoyer tout",
+		AllBM 							= "Envoyer tout",
 		
 		NOTHING	 						= "Rien",
 		BANK_TO_INVENTORY				= "Vers l'Inventaire",

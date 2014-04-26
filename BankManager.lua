@@ -314,7 +314,7 @@ local function options()
     LAM:AddHeader(optionsPanel, "versionBM", "|c3366FF" .. getTranslated("version").."|r:" .. currentVersion)
     LAM:AddHeader(optionsPanel, "headerBM", "|c3366FF" .. getTranslated("title").."|r" )
 
-    LAM:AddDropdown(optionsPanel, "languageBM", getTranslated("dropDownlanguageText"), getTranslated("dropDownlanguageTooltip"), languages,
+    LAM:AddDropdown(optionsPanel, "languageBM", getTranslated("dropDownLanguageText"), getTranslated("dropDownLanguageTooltip"), languages,
             function() return BankManager.Saved["language"] end,
             changelanguage,
             true , getTranslated("reloadWarning"))
