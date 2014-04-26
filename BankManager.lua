@@ -286,6 +286,7 @@ end
 
 --Browse the language to find the key back
 local function changeItemsSendingType(val,key)
+    key = string.gsub(key, "#", "")
     for keyTrad,tradValue in pairs(language[BankManager.Saved["language"]]) do
         if tradValue == val then
             BankManager.Saved[key] = keyTrad
@@ -308,7 +309,7 @@ end
 local function options()
     local textCheckBox = ""
     local craftName, textCheckBox, othersKey
-    local LAM = LibStub("LibAddonMenu-1.0(BankManager)")
+    local LAM = LibStub("BankManager_LibAddonMenu-1.0")
     local optionsPanel = LAM:CreateControlPanel("Bank Manager", "Bank Manager")
     LAM:AddHeader(optionsPanel, "versionBM", "|c3366FF" .. getTranslated("version").."|r:" .. currentVersion)
     LAM:AddHeader(optionsPanel, "headerBM", "|c3366FF" .. getTranslated("title").."|r" )
@@ -332,8 +333,8 @@ local function options()
     LAM:AddHeader(optionsPanel, "craftHeaderBM",  "|c3366FF" .. getTranslated("craftHeader").."|r")
 	for key,craftKey in pairs(craftingElements) do
         local craftName = getTranslated(craftKey)
-        --The checkbox
-        LAM:AddDropdown(optionsPanel, craftKey, craftName, "", getSendingTypeList(),
+        --The checkbox -- #is for the conflict 
+        LAM:AddDropdown(optionsPanel, craftKey.."#", craftName, "", getSendingTypeList(),
             function() return getTranslated(BankManager.Saved[craftKey]) end,
             changeItemsSendingType)    
     end
@@ -342,8 +343,8 @@ local function options()
     LAM:AddHeader(optionsPanel, "othersHeaderBM", "|c3366FF" .. getTranslated("othersHeader").."|r")
     for key,othersKey in pairs(othersElements) do
         local othersName = getTranslated(othersKey)
-        --The checkbox
-        LAM:AddDropdown(optionsPanel, othersKey, othersName, "", getSendingTypeList(),
+        --The checkbox -- #is for the conflict 
+        LAM:AddDropdown(optionsPanel, othersKey.."#", othersName, "", getSendingTypeList(),
             function() return getTranslated(BankManager.Saved[othersKey]) end,
             changeItemsSendingType)    
     end

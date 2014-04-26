@@ -1,4 +1,4 @@
-local MAJOR, MINOR = "LibAddonMenu-1.0(BankManager)", 6
+local MAJOR, MINOR = "BankManager_LibAddonMenu-1.0", 10
 local lam, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 if not lam then return end	--the same or newer version of this lib is already loaded into memory 
 
