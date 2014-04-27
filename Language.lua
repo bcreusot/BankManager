@@ -160,7 +160,7 @@ language = {
         --type of others
         ITEMTYPE_WEAPON                 = "Waffen", 
         ITEMTYPE_WEAPON_BOOSTER         = "Waffen-Aufwertungen",            
-        ITEMTYPE_ARMOR                  = "Rüsrungen",  
+        ITEMTYPE_ARMOR                  = "Rüstungen",  
         ITEMTYPE_ARMOR_BOOSTER          = "Rüstungs-Aufwertungen",      
         ITEMTYPE_COSTUME                = "Kostüme",        
         ITEMTYPE_DISGUISE               = "Verkleidungen",      

@@ -101,16 +101,11 @@ local function getItemState(craftingType,itemType)
            itemType == ITEMTYPE_ALCHEMY_BASE or
            itemType == ITEMTYPE_WOODWORKING_RAW_MATERIAL) then
         itemType = ITEMTYPE_RAW_MATERIAL
-        d("raw")
     end
 
     --If the craft of itemtype is known and we got a entry for it (we treat it)
     if craftingType ~= CRAFTING_TYPE_INVALID and CRAFTING_TYPE_TRANSLATION[craftingType] then
         if itemType == ITEMTYPE_RAW_MATERIAL and BankManager.Saved[ITEMTYPE_TRANSLATION[itemType]] ~= MATCH_CRAFT then
-            d("test")
-            d(itemType)
-            d(ITEMTYPE_TRANSLATION[itemType])
-            d(BankManager.Saved[ITEMTYPE_TRANSLATION[itemType]])
             return BankManager.Saved[ITEMTYPE_TRANSLATION[itemType]]
         else
             return BankManager.Saved[CRAFTING_TYPE_TRANSLATION[craftingType]]
@@ -165,11 +160,6 @@ local function getBagDescription(bag,pushItems,pullItems)
             item.itemType     = itemType
             item.craftType    = craftInfo
             item.state        = getItemState(craftInfo,itemType)
-            if itemType == 35 then
-                d(itemName)
-                d(item.state)
-            end
-
         end
         --if the item is not from the junk, and if the items got room for more
         if (not isJunk) and idItem ~= nil  then
