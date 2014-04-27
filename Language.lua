@@ -19,6 +19,7 @@ language = {
 		NOTHING	 						= "Nothing",
 		BANK_TO_INVENTORY				= "Pull to Inventory",
 		INVENTORY_TO_BANK				= "Push to Bank",
+		MATCH_CRAFT						= "Match the corresponding craft",
 		
 		itemsMoved						= "item(s) moved",
 		itemsStacked					= "item(s) stacked",
@@ -76,6 +77,7 @@ language = {
 		NOTHING	 						= "Rien",
 		BANK_TO_INVENTORY				= "Vers l'Inventaire",
 		INVENTORY_TO_BANK				= "Vers la Banque",
+		MATCH_CRAFT						= "Match le craft correspondant",
 
 		itemsMoved						= "objet(s) deplacé(s)",
 		itemsStacked					= "objet(s) stacké(s)",
@@ -115,5 +117,64 @@ language = {
 		ITEMTYPE_SOUL_GEM				= "Gemmes d'âmes",		
 		ITEMTYPE_TABARD					= "Tabards",	
 		ITEMTYPE_TROPHY					= "Trophés"	
-	}
+	},
+	Deutsch = {
+        --Option Translation
+        version                         = "Version",
+        title                           = "Bank Manager",
+        reloadWarning                   = "Das Interface wird neuladen",
+        
+        dropDownLanguageText            = "Sprache",
+        dropDownLanguageTooltip         = "Wähle deine Sprache",
+        
+        spamChatText                    = "Chat Spam",
+        spamChatTooltip                 = "Verschobene Objekte im Chat zeigen",
+        
+        AllBM                           = "Alle Objekte",
+        
+        NOTHING                         = "Nichts",
+        BANK_TO_INVENTORY               = "In das Inventar holen",
+        INVENTORY_TO_BANK               = "In die Bank schieben",
+   		MATCH_CRAFT						= "Match entsprechenden Handwerk",
+
+        
+        itemsMoved                      = "Objekt(e) verschoben",
+        itemsStacked                    = "Objekt(e) gestapelt",
+        
+        --CRAFT
+        craftHeader                     = "HANDWERK",
+        --Types of craft
+        CRAFTING_TYPE_BLACKSMITHING     = "Schmiedekunst",
+        CRAFTING_TYPE_CLOTHIER          = "Schneiderei",
+        CRAFTING_TYPE_ENCHANTING        = "Verzaubern",
+        CRAFTING_TYPE_ALCHEMY           = "Alchemie",
+        CRAFTING_TYPE_PROVISIONING      = "Versorgen",
+        CRAFTING_TYPE_WOODWORKING       = "Schreinerei",
+        CRAFTING_TYPE_RAW               = "Rohstoffe",
+        ITEMTYPE_STYLE_MATERIAL         = "Style Material",         
+        ITEMTYPE_WEAPON_TRAIT           = "Waffen-Eigenschaften",           
+        ITEMTYPE_ARMOR_TRAIT            = "Rüstungs-Eigenschaften",         
+ 
+        --OTHERS
+        othersHeader                    = "ANDERES",
+        --type of others
+        ITEMTYPE_WEAPON                 = "Waffen", 
+        ITEMTYPE_WEAPON_BOOSTER         = "Waffen-Aufwertungen",            
+        ITEMTYPE_ARMOR                  = "Rüsrungen",  
+        ITEMTYPE_ARMOR_BOOSTER          = "Rüstungs-Aufwertungen",      
+        ITEMTYPE_COSTUME                = "Kostüme",        
+        ITEMTYPE_DISGUISE               = "Verkleidungen",      
+        ITEMTYPE_DRINK                  = "Getränke",   
+        ITEMTYPE_FOOD                   = "Essen",  
+        ITEMTYPE_AVA_REPAIR             = "Reparaturkits",      
+        ITEMTYPE_LOCKPICK               = "Dietriche",      
+        ITEMTYPE_POTION                 = "Tränke", 
+        ITEMTYPE_POISON                 = "Gifte",  
+        ITEMTYPE_RECIPE                 = "Rezepte",    
+        ITEMTYPE_SCROLL                 = "Schriftrollen",  
+        ITEMTYPE_SIEGE                  = "Belagerungswaffen",  
+        ITEMTYPE_SOUL_GEM               = "Seelensteine",       
+        ITEMTYPE_TABARD                 = "Wappenröcke",    
+        ITEMTYPE_TROPHY                 = "Trophäen"    
+    }
 }

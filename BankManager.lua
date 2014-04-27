@@ -48,16 +48,25 @@ craftingElements = {
 NOTHING             = "NOTHING"
 BANK_TO_INVENTORY   = "BANK_TO_INVENTORY"
 INVENTORY_TO_BANK   = "INVENTORY_TO_BANK"
+MATCH_CRAFT         = "MATCH_CRAFT"
 
 sendingType = {
     NOTHING,
     BANK_TO_INVENTORY,
     INVENTORY_TO_BANK
 }
+rawSendingType = {
+    NOTHING,
+    MATCH_CRAFT,
+    BANK_TO_INVENTORY,
+    INVENTORY_TO_BANK
+}
+
 
 languages = {
     "English",
-    "Francais"
+    "Francais",
+    "Deutsch"
 }
 
 
@@ -87,9 +96,25 @@ local function getTranslated(text)
 end
 
 local function getItemState(craftingType,itemType)
+    if (itemType == ITEMTYPE_BLACKSMITHING_RAW_MATERIAL or 
+           itemType == ITEMTYPE_CLOTHIER_RAW_MATERIAL or
+           itemType == ITEMTYPE_ALCHEMY_BASE or
+           itemType == ITEMTYPE_WOODWORKING_RAW_MATERIAL) then
+        itemType = ITEMTYPE_RAW_MATERIAL
+        d("raw")
+    end
+
     --If the craft of itemtype is known and we got a entry for it (we treat it)
     if craftingType ~= CRAFTING_TYPE_INVALID and CRAFTING_TYPE_TRANSLATION[craftingType] then
-        return BankManager.Saved[CRAFTING_TYPE_TRANSLATION[craftingType]]
+        if itemType == ITEMTYPE_RAW_MATERIAL and BankManager.Saved[ITEMTYPE_TRANSLATION[itemType]] ~= MATCH_CRAFT then
+            d("test")
+            d(itemType)
+            d(ITEMTYPE_TRANSLATION[itemType])
+            d(BankManager.Saved[ITEMTYPE_TRANSLATION[itemType]])
+            return BankManager.Saved[ITEMTYPE_TRANSLATION[itemType]]
+        else
+            return BankManager.Saved[CRAFTING_TYPE_TRANSLATION[craftingType]]
+        end
     end
     if itemType ~= ITEMTYPE_NONE and ITEMTYPE_TRANSLATION[itemType] then
         return BankManager.Saved[ITEMTYPE_TRANSLATION[itemType]]
@@ -102,7 +127,6 @@ local function displayChat(itemName, quantity, moved)
     if startString ~= nil then
         itemName = string.sub(itemName,0,startString-1)
     end
-
     if BankManager.Saved["spamChat"] then
         if moved then
             d(quantity .. " " .. itemName .. " " .. getTranslated("itemsMoved"))
@@ -141,6 +165,10 @@ local function getBagDescription(bag,pushItems,pullItems)
             item.itemType     = itemType
             item.craftType    = craftInfo
             item.state        = getItemState(craftInfo,itemType)
+            if itemType == 35 then
+                d(itemName)
+                d(item.state)
+            end
 
         end
         --if the item is not from the junk, and if the items got room for more
@@ -239,6 +267,7 @@ local function moveItems()
             -- if there is a place in the bank at least
             elseif next(bankFreeSlots) ~= nil then
                 placeItems(item.bag, item.slot, BAG_BANK, table.remove(bankFreeSlots), item.stack)
+                displayChat(item.name, item.stack, true)
                 nbItemsMove  = nbItemsMove + 1
                 table.remove(pushItems,k)
             --if not there is no point to continue
@@ -252,6 +281,7 @@ local function moveItems()
                 table.remove(pullItems,k)
             elseif next(inventoryFreeSlots) ~= nil then
                 placeItems(item.bag, item.slot, BAG_BACKPACK, table.remove(inventoryFreeSlots), item.stack)
+                displayChat(item.name, item.stack, true)
                 nbItemsMove  = nbItemsMove + 1
                 table.remove(pullItems,k)
             else
@@ -297,9 +327,9 @@ local function changeItemsSendingType(val,key)
 end
 
 
-local function getSendingTypeList()
+local function getSendingTypeList(arraySendingType)
     local result = {}
-    for i,v in ipairs(sendingType) do
+    for i,v in ipairs(arraySendingType) do
         table.insert(result,getTranslated(v))
     end
     return result
@@ -324,7 +354,7 @@ local function options()
                 function(val) BankManager.Saved["spamChat"] = val end)
 
 
-    LAM:AddDropdown(optionsPanel, "AllBM", getTranslated("AllBM"), "", getSendingTypeList(),
+    LAM:AddDropdown(optionsPanel, "AllBM", getTranslated("AllBM"), "", getSendingTypeList(sendingType),
             function() return getTranslated(BankManager.Saved["AllBM"]) end,
             changeItemsSendingType)
 
@@ -333,8 +363,13 @@ local function options()
     LAM:AddHeader(optionsPanel, "craftHeaderBM",  "|c3366FF" .. getTranslated("craftHeader").."|r")
 	for key,craftKey in pairs(craftingElements) do
         local craftName = getTranslated(craftKey)
+        sendingTypeTab = sendingType
+        --special treatment if this is Raw Material
+        if othersKey == CRAFTING_TYPE_RAW then
+            sendingTypeTab = rawSendingType
+        end
         --The checkbox -- #is for the conflict 
-        LAM:AddDropdown(optionsPanel, craftKey.."#", craftName, "", getSendingTypeList(),
+        LAM:AddDropdown(optionsPanel, craftKey.."#", craftName, "", getSendingTypeList(sendingTypeTab),
             function() return getTranslated(BankManager.Saved[craftKey]) end,
             changeItemsSendingType)    
     end
@@ -343,8 +378,10 @@ local function options()
     LAM:AddHeader(optionsPanel, "othersHeaderBM", "|c3366FF" .. getTranslated("othersHeader").."|r")
     for key,othersKey in pairs(othersElements) do
         local othersName = getTranslated(othersKey)
+
+
         --The checkbox -- #is for the conflict 
-        LAM:AddDropdown(optionsPanel, othersKey.."#", othersName, "", getSendingTypeList(),
+        LAM:AddDropdown(optionsPanel, othersKey.."#", othersName, "", getSendingTypeList(sendingType),
             function() return getTranslated(BankManager.Saved[othersKey]) end,
             changeItemsSendingType)    
     end
@@ -358,7 +395,7 @@ function init(eventCode, addOnName)
     local defaults = {
         ["language"]                = "English",
         ["spamChat"]                = false,
-        ["AllBM"]                     = NOTHING
+        ["AllBM"]                   = NOTHING
     }
     
     for k,v in ipairs(craftingElements) do
