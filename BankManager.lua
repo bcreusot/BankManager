@@ -166,9 +166,17 @@ local function getBagDescription(bag,pushItems,pullItems)
             if itemStack < itemMaxStack then
                 itemsTables[idItem] = item
             end
-            if ((item.state == INVENTORY_TO_BANK  or BankManager.Saved.AllBM == INVENTORY_TO_BANK) and bag ~= BAG_BANK) then
+            --if the all option is disabled
+            if BankManager.Saved.AllBM == NOTHING then
+                if (item.state == INVENTORY_TO_BANK and bag ~= BAG_BANK) then
+                    table.insert(pushItems,item)
+                elseif (item.state == BANK_TO_INVENTORY and bag ~= BAG_BACKPACK) then
+                    table.insert(pullItems,item)
+                end
+            --if we gotta pull everything in bank and this is not the bank :)
+            elseif BankManager.Saved.AllBM == INVENTORY_TO_BANK and bag ~= BAG_BANK then
                 table.insert(pushItems,item)
-            elseif ((item.state == BANK_TO_INVENTORY or BankManager.Saved.AllBM == BANK_TO_INVENTORY) and bag ~= BAG_BACKPACK) then
+            elseif BankManager.Saved.AllBM == BANK_TO_INVENTORY and bag ~= BAG_BACKPACK then
                 table.insert(pullItems,item)
             end
         elseif idItem == nil then
@@ -242,12 +250,9 @@ local function moveItems()
         end
     end
 
-
     -- if there is place in both bags AND there is something to move
 
-    while ((next(bankFreeSlots) ~= nil and next(pushItems) ~= nil) or (next(pullItems) ~= nil and next(inventoryFreeSlots) ~= nil) and securityCounter < 300) do
-    
-    --while ((next(bankFreeSlots) ~= nil or next(inventoryFreeSlots) ~= nil) and (next(pushItems) ~= nil or next(pullItems) ~= nil) and securityCounter < 1000) do
+    while ((next(bankFreeSlots) ~= nil and next(pushItems) ~= nil) or (next(inventoryFreeSlots) ~= nil and next(pullItems) ~= nil) and securityCounter < 300) do
         securityCounter = securityCounter +1
         --We begin by pushing items from inventory
         for k,item in pairs(pushItems) do
@@ -257,6 +262,8 @@ local function moveItems()
             -- if there is a place in the bank at least
             elseif next(bankFreeSlots) ~= nil then
                 placeItems(item.bag, item.slot, BAG_BANK, table.remove(bankFreeSlots), item.stack)
+                --new place in bank
+                table.insert(inventoryFreeSlots,item.slot)
                 displayChat(item.name, item.stack, true)
                 nbItemsMove  = nbItemsMove + 1
                 table.remove(pushItems,k)
@@ -271,6 +278,8 @@ local function moveItems()
                 table.remove(pullItems,k)
             elseif next(inventoryFreeSlots) ~= nil then
                 placeItems(item.bag, item.slot, BAG_BACKPACK, table.remove(inventoryFreeSlots), item.stack)
+                --new place in bank
+                table.insert(bankFreeSlots,item.slot)
                 displayChat(item.name, item.stack, true)
                 nbItemsMove  = nbItemsMove + 1
                 table.remove(pullItems,k)

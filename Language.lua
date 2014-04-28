@@ -135,7 +135,7 @@ language = {
         NOTHING                         = "Nichts",
         BANK_TO_INVENTORY               = "In das Inventar holen",
         INVENTORY_TO_BANK               = "In die Bank schieben",
-   		MATCH_CRAFT						= "Match entsprechenden Handwerk",
+   		MATCH_CRAFT						= "Entsprechend des Berufs",
 
         
         itemsMoved                      = "Objekt(e) verschoben",
