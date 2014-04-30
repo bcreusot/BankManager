@@ -3,7 +3,7 @@
 	***** Bank Manager *****
 	* Benjamin Creusot - Todo
 	* 17/04/2014 
-	* v2.5
+	* v2.5.2
 		Manage easily your bank. Automatically places items in your bank/inventory
 	-------------------
 ]]--
@@ -11,7 +11,7 @@
 
  -- Global Vars
 BankManagerVars = "BMVars"
-currentVersion  = "2.5"
+currentVersion  = "2.5.2"
 
 othersElements = {
     "ITEMTYPE_WEAPON",
@@ -74,7 +74,9 @@ languages = {
 
 -- Main Vars
 BankManager = {}
-
+--Limit the number of message in the chat to avoid spamming detection by the game
+counterMessageChat = 0
+limitMessageChat   = 30
 
 local function placeItems(fromBag, fromSlot, destBag, destSlot, quantity)
     --[[local fromName = GetItemName(fromBag, fromSlot)
@@ -118,17 +120,20 @@ local function getItemState(craftingType,itemType)
 end
 
 local function displayChat(itemName, quantity, moved)
-    local startString,endString = string.find(itemName,"%^")
-    if startString ~= nil then
-        itemName = string.sub(itemName,0,startString-1)
-    end
-    if BankManager.Saved["spamChat"] then
-        if moved then
-            d(quantity .. " " .. itemName .. " " .. getTranslated("itemsMoved"))
-        else
-            d(quantity .. " " .. itemName .. " " .. getTranslated("itemsStacked"))
+    if(counterMessageChat <= limitMessageChat) then
+        local startString,endString = string.find(itemName,"%^")
+        if startString ~= nil then
+            itemName = string.sub(itemName,0,startString-1)
+        end
+        if BankManager.Saved["spamChat"] then
+            if moved then
+                d(quantity .. " " .. itemName .. " " .. getTranslated("itemsMoved"))
+            else
+                d(quantity .. " " .. itemName .. " " .. getTranslated("itemsStacked"))
+            end
         end
     end
+    counterMessageChat = counterMessageChat +1
 end
 
 --Return the tables of stackable items in the bag and a table of all free spots
@@ -292,10 +297,17 @@ local function moveItems()
     if(securityCounter > 299) then
         d("Something went wrong : plz send me a message on the forum of esoui, pseudo : Todo")
     end
+
+    if BankManager.Saved["spamChat"] and counterMessageChat > limitMessageChat then
+        d((counterMessageChat - limitMessageChat) .. " " .. getTranslated("noDisplayed"))
+    end
+
     d("----------------------")
     d(nbItemsMove .. " " .. getTranslated("itemsMoved"))
     d(nbItemsStack .. " " .. getTranslated("itemsStacked"))
     d("----------------------")
+
+    counterMessageChat = 0
 end
 
 function bankOpening(eventCode, addOnName, isManual)

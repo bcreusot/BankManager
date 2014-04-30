@@ -21,6 +21,7 @@ language = {
 		INVENTORY_TO_BANK				= "Push to Bank",
 		MATCH_CRAFT						= "Match the corresponding craft",
 		
+		noDisplayed						= "messages not displayed",
 		itemsMoved						= "item(s) moved",
 		itemsStacked					= "item(s) stacked",
 		
@@ -79,6 +80,7 @@ language = {
 		INVENTORY_TO_BANK				= "Vers la Banque",
 		MATCH_CRAFT						= "Match le craft correspondant",
 
+		noDisplayed						= "non affiché(s)",
 		itemsMoved						= "objet(s) deplacé(s)",
 		itemsStacked					= "objet(s) stacké(s)",
 		
@@ -137,7 +139,7 @@ language = {
         INVENTORY_TO_BANK               = "In die Bank schieben",
    		MATCH_CRAFT						= "Entsprechend des Berufs",
 
-        
+        noDisplayed						= "meldungen nicht angezeigt",
         itemsMoved                      = "Objekt(e) verschoben",
         itemsStacked                    = "Objekt(e) gestapelt",
         
