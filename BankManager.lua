@@ -13,6 +13,11 @@
 BankManagerVars = "BMVars"
 currentVersion  = "2.5.2"
 
+banks = {
+    "BAG_BANK",
+    "BAG_GUILDBANK"
+}
+
 othersElements = {
     "ITEMTYPE_WEAPON",
     "ITEMTYPE_WEAPON_BOOSTER",
@@ -22,6 +27,7 @@ othersElements = {
     "ITEMTYPE_DISGUISE",
     "ITEMTYPE_DRINK",
     "ITEMTYPE_FOOD",
+    "ITEMTYPE_LURE",
     "ITEMTYPE_AVA_REPAIR",
     "ITEMTYPE_LOCKPICK",
     "ITEMTYPE_POTION",
@@ -173,13 +179,13 @@ local function getBagDescription(bag,pushItems,pullItems)
             end
             --if the all option is disabled
             if BankManager.Saved.AllBM == NOTHING then
-                if (item.state == INVENTORY_TO_BANK and bag ~= BAG_BANK) then
+                if (item.state == INVENTORY_TO_BANK and bag ~= BANKS_TRANSLATION[BankManager.Saved.bankChoice]) then
                     table.insert(pushItems,item)
                 elseif (item.state == BANK_TO_INVENTORY and bag ~= BAG_BACKPACK) then
                     table.insert(pullItems,item)
                 end
             --if we gotta pull everything in bank and this is not the bank :)
-            elseif BankManager.Saved.AllBM == INVENTORY_TO_BANK and bag ~= BAG_BANK then
+            elseif BankManager.Saved.AllBM == INVENTORY_TO_BANK and bag ~= BANKS_TRANSLATION[BankManager.Saved.bankChoice] then
                 table.insert(pushItems,item)
             elseif BankManager.Saved.AllBM == BANK_TO_INVENTORY and bag ~= BAG_BACKPACK then
                 table.insert(pullItems,item)
@@ -220,7 +226,7 @@ end
 local function moveItems()
     local nbItemsMove,nbItemsStack                 = 0,0
     local pushItems,pullItems                      = {},{}
-    local bankBag                                  = BAG_BANK
+    local bankBag                                  = BANKS_TRANSLATION[BankManager.Saved.bankChoice]
     local backpackBag                              = BAG_BACKPACK
     local bankItemsTable, bankFreeSlots            = {},{}
     local inventoryItemsTable, inventoryFreeSlots  = {},{}
@@ -251,6 +257,13 @@ local function moveItems()
             elseif (itemBank.state == BANK_TO_INVENTORY or BankManager.Saved.AllBM == BANK_TO_INVENTORY) then
                 stackItems(idItem,bankItemsTable,inventoryItemsTable,bankFreeSlots)
                 nbItemsStack = nbItemsStack + 1
+            --We consider here that the item  has no specific place to go
+            elseif (BankManager.Saved["fillStacks"] == INVENTORY_TO_BANK) then
+                stackItems(idItem,inventoryItemsTable,bankItemsTable,inventoryFreeSlots)
+                nbItemsStack = nbItemsStack + 1
+            elseif (BankManager.Saved["fillStacks"] == BANK_TO_INVENTORY) then
+                stackItems(idItem,bankItemsTable,inventoryItemsTable,bankFreeSlots)
+                nbItemsStack = nbItemsStack + 1
             end
         end
     end
@@ -266,7 +279,7 @@ local function moveItems()
                 table.remove(pushItems,k)
             -- if there is a place in the bank at least
             elseif next(bankFreeSlots) ~= nil then
-                placeItems(item.bag, item.slot, BAG_BANK, table.remove(bankFreeSlots), item.stack)
+                placeItems(item.bag, item.slot, BANKS_TRANSLATION[BankManager.Saved.bankChoice], table.remove(bankFreeSlots), item.stack)
                 --new place in bank
                 table.insert(inventoryFreeSlots,item.slot)
                 displayChat(item.name, item.stack, true)
@@ -314,9 +327,13 @@ function bankOpening(eventCode, addOnName, isManual)
     if isManual then
         return
     end
-
-    ClearCursor()
-    moveItems()
+    if BankManager.Saved.bankChoice == "BAG_BANK" and eventCode == EVENT_OPEN_BANK then
+        ClearCursor()
+        moveItems()
+    elseif BankManager.Saved.bankChoice == "BAG_GUILDBANK" and eventCode == EVENT_OPEN_GUILD_BANK then
+        ClearCursor()
+        moveItems()
+    end
 
 end
 
@@ -326,7 +343,7 @@ local function changelanguage(val,controleKey)
 end
 
 --Browse the language to find the key back
-local function changeItemsSendingType(val,key)
+local function changeTranslateTable(val,key)
     key = string.gsub(key, "#", "")
     for keyTrad,tradValue in pairs(language[BankManager.Saved["language"]]) do
         if tradValue == val then
@@ -338,7 +355,7 @@ local function changeItemsSendingType(val,key)
 end
 
 
-local function getSendingTypeList(arraySendingType)
+local function getTranslateTable(arraySendingType)
     local result = {}
     for i,v in ipairs(arraySendingType) do
         table.insert(result,getTranslated(v))
@@ -359,30 +376,41 @@ local function options()
             function() return BankManager.Saved["language"] end,
             changelanguage,
             true , getTranslated("reloadWarning"))
+    
+    LAM:AddDropdown(optionsPanel, "bankChoice", "|cFF0000" .. getTranslated("bankChoice").."|r", getTranslated("bankChoiceTooltip"), getTranslateTable(banks),
+            function() return getTranslated(BankManager.Saved["bankChoice"]) end,
+            changeTranslateTable,true)
+
 
     LAM:AddCheckbox(optionsPanel, "spamChatBM", getTranslated("spamChatText"), getTranslated("spamChatTooltip"),
-                function() return BankManager.Saved["spamChat"] end,
-                function(val) BankManager.Saved["spamChat"] = val end)
+            function() return BankManager.Saved["spamChat"] end,
+            function(val) BankManager.Saved["spamChat"] = val end)
 
 
-    LAM:AddDropdown(optionsPanel, "AllBM", getTranslated("AllBM"), "", getSendingTypeList(sendingType),
+    LAM:AddDropdown(optionsPanel, "AllBM", getTranslated("AllBM"), "", getTranslateTable(sendingType),
             function() return getTranslated(BankManager.Saved["AllBM"]) end,
-            changeItemsSendingType)
+            changeTranslateTable)
+
+    LAM:AddDropdown(optionsPanel, "fillStacks", getTranslated("fillStacks"), getTranslated("fillStacksTooltip"), getTranslateTable(sendingType),
+            function() return getTranslated(BankManager.Saved["fillStacks"]) end,
+            changeTranslateTable)
 
 
     --CRAFT MODE
     LAM:AddHeader(optionsPanel, "craftHeaderBM",  "|c3366FF" .. getTranslated("craftHeader").."|r")
 	for key,craftKey in pairs(craftingElements) do
         local craftName = getTranslated(craftKey)
-        sendingTypeTab = sendingType
         --special treatment if this is Raw Material
-        if othersKey == CRAFTING_TYPE_RAW then
-            sendingTypeTab = rawSendingType
-        end
-        --The checkbox -- #is for the conflict 
-        LAM:AddDropdown(optionsPanel, craftKey.."#", craftName, "", getSendingTypeList(sendingTypeTab),
+        if craftKey == "CRAFTING_TYPE_RAW" then
+            --The checkbox -- #is for the conflict    
+            LAM:AddDropdown(optionsPanel, craftKey.."#", craftName, "", getTranslateTable(rawSendingType),
             function() return getTranslated(BankManager.Saved[craftKey]) end,
-            changeItemsSendingType)    
+            changeTranslateTable,true,getTranslated("rawsWarning")) 
+        else
+            LAM:AddDropdown(optionsPanel, craftKey.."#", craftName, "", getTranslateTable(sendingType),
+            function() return getTranslated(BankManager.Saved[craftKey]) end,
+            changeTranslateTable) 
+        end
     end
 
     --OTHERS MODE
@@ -392,9 +420,9 @@ local function options()
 
 
         --The checkbox -- #is for the conflict 
-        LAM:AddDropdown(optionsPanel, othersKey.."#", othersName, "", getSendingTypeList(sendingType),
+        LAM:AddDropdown(optionsPanel, othersKey.."#", othersName, "", getTranslateTable(sendingType),
             function() return getTranslated(BankManager.Saved[othersKey]) end,
-            changeItemsSendingType)    
+            changeTranslateTable)    
     end
 end
 
@@ -405,8 +433,10 @@ function init(eventCode, addOnName)
     local initVarFalse              = NOTHING
     local defaults = {
         ["language"]                = "English",
+        ["bankChoice"]              = "BAG_BANK",
         ["spamChat"]                = false,
-        ["AllBM"]                   = NOTHING
+        ["AllBM"]                   = NOTHING,
+        ["fillStacks"]              = NOTHING
     }
     
     for k,v in ipairs(craftingElements) do
@@ -416,10 +446,23 @@ function init(eventCode, addOnName)
         defaults[v] = initVarFalse
     end
     BankManager.Saved = ZO_SavedVars:New(BankManagerVars, 1, nil, defaults, nil)
+    
+    --New vars until changing version saved number
+    if not BankManager.Saved.fillStacks then
+        BankManager.Saved.fillStacks = NOTHING
+    end
+    if not BankManager.Saved.ITEMTYPE_LURE then
+        BankManager.Saved.ITEMTYPE_LURE = NOTHING
+    end
+    if not BankManager.Saved.bankChoice then
+        BankManager.Saved.bankChoice = "BAG_BANK"
+    end
+
 
     options()
     
     EVENT_MANAGER:RegisterForEvent("BankManager", EVENT_OPEN_BANK, bankOpening)
+    EVENT_MANAGER:RegisterForEvent("BankManager", EVENT_OPEN_GUILD_BANK, bankOpening)
 end
 
 

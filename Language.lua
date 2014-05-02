@@ -11,10 +11,17 @@ language = {
 		dropDownLanguageText			= "Language",
 		dropDownLanguageTooltip			= "Select your language",
 		
+		bankChoice						= "Target Bank",
+		bankChoiceTooltip				= "Select the Target Bank",
+		BAG_BANK						= "Bank",
+		BAG_GUILDBANK					= "Guild Bank",
+
 		spamChatText					= "Chat Spam",
 		spamChatTooltip					= "Display moved items in the chat",
 		
 		AllBM      						= "All items",
+		fillStacks						= "Fill Stacks",
+		fillStacksTooltip				= "Fill uncomplete stacks for optionless items",
 		
 		NOTHING	 						= "Nothing",
 		BANK_TO_INVENTORY				= "Pull to Inventory",
@@ -35,6 +42,7 @@ language = {
 		CRAFTING_TYPE_PROVISIONING		= "Provisioning",
 		CRAFTING_TYPE_WOODWORKING		= "Woodworking",
 		CRAFTING_TYPE_RAW				= "Raw Materials",
+		rawsWarning						= "Raws won't move if this option is set to None",
 		ITEMTYPE_STYLE_MATERIAL			= "Style Materials",			
 		ITEMTYPE_WEAPON_TRAIT			= "Weapon Traits",			
 		ITEMTYPE_ARMOR_TRAIT			= "Armor Traits",			
@@ -49,7 +57,8 @@ language = {
 		ITEMTYPE_COSTUME				= "Costumes",		
 		ITEMTYPE_DISGUISE				= "Disguises",		
 		ITEMTYPE_DRINK					= "Drinks",	
-		ITEMTYPE_FOOD					= "Foods",	
+		ITEMTYPE_FOOD					= "Foods",
+		ITEMTYPE_LURE					= "Baits",
 		ITEMTYPE_AVA_REPAIR				= "Repair Items",		
 		ITEMTYPE_LOCKPICK				= "Lockpicks",		
 		ITEMTYPE_POTION					= "Potions",	
@@ -69,11 +78,18 @@ language = {
 
 		dropDownLanguageText			= "Langue",
 		dropDownLanguageTooltip			= "Selectionnez votre langue",
+		
+		bankChoice						= "Banque cible",
+		bankChoiceTooltip				= "Selectionner la banque cible",
+		BAG_BANK						= "Banque",
+		BAG_GUILDBANK					= "Banque de Guilde",
 
 		spamChatText					= "Spam du chat",
 		spamChatTooltip					= "Affiche les items deplacés dans le chat",
 
 		AllBM 							= "Envoyer tout",
+		fillStacks						= "Completer les tas",
+		fillStacksTooltip				= "Completer les tas non spécifiés par les options en dessous",
 		
 		NOTHING	 						= "Rien",
 		BANK_TO_INVENTORY				= "Vers l'Inventaire",
@@ -94,6 +110,7 @@ language = {
 		CRAFTING_TYPE_PROVISIONING		= "Cuisine",
 		CRAFTING_TYPE_WOODWORKING		= "Travail du bois",
 		CRAFTING_TYPE_RAW				= "Matériaux bruts",
+		rawsWarning						= "Les Matériaux bruts ne bougeront pas si cette option est à Rien",
 		ITEMTYPE_STYLE_MATERIAL			= "Matériaux de Styles",			
 		ITEMTYPE_WEAPON_TRAIT			= "Caractéristiques d'arme",			
 		ITEMTYPE_ARMOR_TRAIT			= "Caractéristiques d'armure",	
@@ -108,7 +125,8 @@ language = {
 		ITEMTYPE_COSTUME				= "Costumes",		
 		ITEMTYPE_DISGUISE				= "Déguisement",		
 		ITEMTYPE_DRINK					= "Boissons",	
-		ITEMTYPE_FOOD					= "Nourritures",	
+		ITEMTYPE_FOOD					= "Nourritures",
+		ITEMTYPE_LURE					= "Appât",	
 		ITEMTYPE_AVA_REPAIR				= "Objets de réparation",		
 		ITEMTYPE_LOCKPICK				= "Crochets",		
 		ITEMTYPE_POTION					= "Potions",	
@@ -128,11 +146,18 @@ language = {
         
         dropDownLanguageText            = "Sprache",
         dropDownLanguageTooltip         = "Wähle deine Sprache",
+
+		bankChoice						= "Zielbank",
+		bankChoiceTooltip				= "Wählen Sie die Zielbank",
+        BAG_BANK						= "Bank",
+		BAG_GUILDBANK					= "Gildenbank",
         
         spamChatText                    = "Chat Spam",
         spamChatTooltip                 = "Verschobene Objekte im Chat zeigen",
         
         AllBM                           = "Alle Objekte",
+        fillStacks 						= "Stacks auffüllen",
+		fillStacksTooltip  				= "Unvollständige Stacks für Items ohne Optionen auffüllen",
         
         NOTHING                         = "Nichts",
         BANK_TO_INVENTORY               = "In das Inventar holen",
@@ -153,6 +178,7 @@ language = {
         CRAFTING_TYPE_PROVISIONING      = "Versorgen",
         CRAFTING_TYPE_WOODWORKING       = "Schreinerei",
         CRAFTING_TYPE_RAW               = "Rohstoffe",
+        rawsWarning						= "",
         ITEMTYPE_STYLE_MATERIAL         = "Style Material",         
         ITEMTYPE_WEAPON_TRAIT           = "Waffen-Eigenschaften",           
         ITEMTYPE_ARMOR_TRAIT            = "Rüstungs-Eigenschaften",         
@@ -167,7 +193,8 @@ language = {
         ITEMTYPE_COSTUME                = "Kostüme",        
         ITEMTYPE_DISGUISE               = "Verkleidungen",      
         ITEMTYPE_DRINK                  = "Getränke",   
-        ITEMTYPE_FOOD                   = "Essen",  
+        ITEMTYPE_FOOD                   = "Essen",
+        ITEMTYPE_LURE					= "Köder",
         ITEMTYPE_AVA_REPAIR             = "Reparaturkits",      
         ITEMTYPE_LOCKPICK               = "Dietriche",      
         ITEMTYPE_POTION                 = "Tränke", 
