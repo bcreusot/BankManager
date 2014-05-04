@@ -1,5 +1,4 @@
 
-
 language = {
 	
 	English = {
@@ -15,6 +14,9 @@ language = {
 		bankChoiceTooltip				= "Select the Target Bank",
 		BAG_BANK						= "Bank",
 		BAG_GUILDBANK					= "Guild Bank",
+		guildChoice						= "Guild Bank to work with",
+		noPermission					= "You haven't got the permission to withdraw/draw",
+		freeSpaceRequired				= "Required at least one free space in inventory",
 
 		spamChatText					= "Chat Spam",
 		spamChatTooltip					= "Display moved items in the chat",
@@ -83,6 +85,10 @@ language = {
 		bankChoiceTooltip				= "Selectionner la banque cible",
 		BAG_BANK						= "Banque",
 		BAG_GUILDBANK					= "Banque de Guilde",
+		guildChoice						= "Banque de Guilde correspondante",
+		noPermission					= "Vous n'avez pas les droits requis pour déposer/retirer",
+		freeSpaceRequired				= "Requiert au moins un espace libre dans l'inventaire",
+
 
 		spamChatText					= "Spam du chat",
 		spamChatTooltip					= "Affiche les items deplacés dans le chat",
@@ -151,6 +157,9 @@ language = {
 		bankChoiceTooltip				= "Wählen Sie die Zielbank",
         BAG_BANK						= "Bank",
 		BAG_GUILDBANK					= "Gildenbank",
+		guildChoice						= "Entsprechende Gildenbank",
+		noPermission					= "Du hast keine Berechtigung etwas zu entnehmen.",
+		freeSpaceRequired				= "#################",
         
         spamChatText                    = "Chat Spam",
         spamChatTooltip                 = "Verschobene Objekte im Chat zeigen",
@@ -178,7 +187,7 @@ language = {
         CRAFTING_TYPE_PROVISIONING      = "Versorgen",
         CRAFTING_TYPE_WOODWORKING       = "Schreinerei",
         CRAFTING_TYPE_RAW               = "Rohstoffe",
-        rawsWarning						= "",
+        rawsWarning						= "Rohstoffe werden nicht verschoben wenn diese Option auf Nichts steht!",
         ITEMTYPE_STYLE_MATERIAL         = "Style Material",         
         ITEMTYPE_WEAPON_TRAIT           = "Waffen-Eigenschaften",           
         ITEMTYPE_ARMOR_TRAIT            = "Rüstungs-Eigenschaften",         
@@ -207,3 +216,8 @@ language = {
         ITEMTYPE_TROPHY                 = "Trophäen"    
     }
 }
+
+
+function getTranslated(text)
+    return language[BankManager.Saved["language"]][text]
+end

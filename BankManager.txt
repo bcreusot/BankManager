@@ -8,6 +8,8 @@
 Libs/LibStub/LibStub.lua
 Libs/LibAddonMenu-1.0(BankManager)/LibAddonMenu-1.0(BankManager).lua
 
-ItemsTranslation.lua
+GlobalVars.lua
 Language.lua
+BankManagerOpts.lua
+GuildBankManager.lua
 BankManager.lua

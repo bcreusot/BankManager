@@ -3,95 +3,19 @@
 	***** Bank Manager *****
 	* Benjamin Creusot - Todo
 	* 17/04/2014 
-	* v2.5.2
+	* v2.5.3
 		Manage easily your bank. Automatically places items in your bank/inventory
 	-------------------
 ]]--
 
-
- -- Global Vars
-BankManagerVars = "BMVars"
-currentVersion  = "2.5.2"
-
-banks = {
-    "BAG_BANK",
-    "BAG_GUILDBANK"
-}
-
-othersElements = {
-    "ITEMTYPE_WEAPON",
-    "ITEMTYPE_WEAPON_BOOSTER",
-    "ITEMTYPE_ARMOR",
-    "ITEMTYPE_ARMOR_BOOSTER",
-    "ITEMTYPE_COSTUME",
-    "ITEMTYPE_DISGUISE",
-    "ITEMTYPE_DRINK",
-    "ITEMTYPE_FOOD",
-    "ITEMTYPE_LURE",
-    "ITEMTYPE_AVA_REPAIR",
-    "ITEMTYPE_LOCKPICK",
-    "ITEMTYPE_POTION",
-    "ITEMTYPE_POISON",
-    "ITEMTYPE_RECIPE",
-    "ITEMTYPE_SCROLL",
-    "ITEMTYPE_SIEGE",
-    "ITEMTYPE_SOUL_GEM",
-    "ITEMTYPE_TABARD",
-    "ITEMTYPE_TROPHY"
-}
-craftingElements = {
-    "CRAFTING_TYPE_RAW",
-    "CRAFTING_TYPE_BLACKSMITHING",
-    "CRAFTING_TYPE_CLOTHIER",     
-    "CRAFTING_TYPE_ENCHANTING",   
-    "CRAFTING_TYPE_ALCHEMY",      
-    "CRAFTING_TYPE_PROVISIONING", 
-    "CRAFTING_TYPE_WOODWORKING",  
-    "ITEMTYPE_STYLE_MATERIAL",
-    "ITEMTYPE_WEAPON_TRAIT",
-    "ITEMTYPE_ARMOR_TRAIT"
-}
-NOTHING             = "NOTHING"
-BANK_TO_INVENTORY   = "BANK_TO_INVENTORY"
-INVENTORY_TO_BANK   = "INVENTORY_TO_BANK"
-MATCH_CRAFT         = "MATCH_CRAFT"
-
-sendingType = {
-    NOTHING,
-    BANK_TO_INVENTORY,
-    INVENTORY_TO_BANK
-}
-rawSendingType = {
-    NOTHING,
-    MATCH_CRAFT,
-    BANK_TO_INVENTORY,
-    INVENTORY_TO_BANK
-}
-
-
-languages = {
-    "English",
-    "Francais",
-    "Deutsch"
-}
-
-
-
-
--- Main Vars
-BankManager = {}
---Limit the number of message in the chat to avoid spamming detection by the game
-counterMessageChat = 0
-limitMessageChat   = 30
-
-local function placeItems(fromBag, fromSlot, destBag, destSlot, quantity)
+function placeItems(fromBag, fromSlot, destBag, destSlot, quantity)
     --[[local fromName = GetItemName(fromBag, fromSlot)
     local destName = GetItemName(destBag, destSlot)
     if destName ~= nil then
         d("(" .. fromName .. ")[" .. fromBag .. "," .. fromSlot .."] => (" .. destName .. ") [" .. destBag .. "," .. destSlot .."] (" .. quantity .. ")")
     else
         d("(" .. fromName .. ")[" .. fromBag .. "," .. fromSlot .."] => (nil) [" .. destBag .. "," .. destSlot .."] (" .. quantity .. ")")
-    end]]--
+    end--]]
     ClearCursor()
     if CallSecureProtected("PickupInventoryItem", fromBag, fromSlot, quantity) then
         CallSecureProtected("PlaceInInventory", destBag, destSlot)
@@ -99,14 +23,10 @@ local function placeItems(fromBag, fromSlot, destBag, destSlot, quantity)
     ClearCursor()
 end
 
-local function getTranslated(text)
-    return language[BankManager.Saved["language"]][text]
-end
 
 local function getItemState(craftingType,itemType)
     if (itemType == ITEMTYPE_BLACKSMITHING_RAW_MATERIAL or 
            itemType == ITEMTYPE_CLOTHIER_RAW_MATERIAL or
-           itemType == ITEMTYPE_ALCHEMY_BASE or
            itemType == ITEMTYPE_WOODWORKING_RAW_MATERIAL) then
         itemType = ITEMTYPE_RAW_MATERIAL
     end
@@ -125,7 +45,7 @@ local function getItemState(craftingType,itemType)
     return NOTHING
 end
 
-local function displayChat(itemName, quantity, moved)
+function displayChat(itemName, quantity, moved)
     if(counterMessageChat <= limitMessageChat) then
         local startString,endString = string.find(itemName,"%^")
         if startString ~= nil then
@@ -230,7 +150,6 @@ local function moveItems()
     local backpackBag                              = BAG_BACKPACK
     local bankItemsTable, bankFreeSlots            = {},{}
     local inventoryItemsTable, inventoryFreeSlots  = {},{}
-    local craftType                                = {}
     local securityCounter                          = 0
     --BANK ANALYZE
     bankItemsTable,bankFreeSlots = getBagDescription(bankBag,pushItems,pullItems)
@@ -245,6 +164,13 @@ local function moveItems()
     
     ]]--
 
+    --If it's the GUILDBANK, we got a special treatment cause of the shitty system of waiting event:)
+    if BankManager.Saved.bankChoice == "BAG_GUILDBANK" and false then
+        initGuildBankManager(backpackBag,bankBag,bankItemsTable,inventoryItemsTable, inventoryFreeSlots,pushItems,pullItems)
+        return
+    end
+
+
     --Stacking time
     for idItem,itemBank in pairs(bankItemsTable) do
         --If the items is present in the dest
@@ -253,20 +179,18 @@ local function moveItems()
             if (itemBank.state == INVENTORY_TO_BANK or BankManager.Saved.AllBM == INVENTORY_TO_BANK) then
                 --Stacking items (by reference) - idItem-fromTable-destTable-fromFreeSpace
                 stackItems(idItem,inventoryItemsTable,bankItemsTable,inventoryFreeSlots)
-                nbItemsStack = nbItemsStack + 1
             elseif (itemBank.state == BANK_TO_INVENTORY or BankManager.Saved.AllBM == BANK_TO_INVENTORY) then
                 stackItems(idItem,bankItemsTable,inventoryItemsTable,bankFreeSlots)
-                nbItemsStack = nbItemsStack + 1
             --We consider here that the item  has no specific place to go
             elseif (BankManager.Saved["fillStacks"] == INVENTORY_TO_BANK) then
                 stackItems(idItem,inventoryItemsTable,bankItemsTable,inventoryFreeSlots)
-                nbItemsStack = nbItemsStack + 1
             elseif (BankManager.Saved["fillStacks"] == BANK_TO_INVENTORY) then
                 stackItems(idItem,bankItemsTable,inventoryItemsTable,bankFreeSlots)
-                nbItemsStack = nbItemsStack + 1
             end
+            nbItemsStack = nbItemsStack + 1
         end
     end
+
 
     -- if there is place in both bags AND there is something to move
 
@@ -319,7 +243,6 @@ local function moveItems()
     d(nbItemsMove .. " " .. getTranslated("itemsMoved"))
     d(nbItemsStack .. " " .. getTranslated("itemsStacked"))
     d("----------------------")
-
     counterMessageChat = 0
 end
 
@@ -330,110 +253,32 @@ function bankOpening(eventCode, addOnName, isManual)
     if BankManager.Saved.bankChoice == "BAG_BANK" and eventCode == EVENT_OPEN_BANK then
         ClearCursor()
         moveItems()
-    elseif BankManager.Saved.bankChoice == "BAG_GUILDBANK" and eventCode == EVENT_OPEN_GUILD_BANK then
+    elseif BankManager.Saved.bankChoice == "BAG_GUILDBANK" and eventCode == EVENT_GUILD_BANK_ITEMS_READY  and BankManager.Saved["guildChoice"] then
         ClearCursor()
-        moveItems()
-    end
-
-end
-
-local function changelanguage(val,controleKey)
-    BankManager.Saved["language"] = val
-    ReloadUI()
-end
-
---Browse the language to find the key back
-local function changeTranslateTable(val,key)
-    key = string.gsub(key, "#", "")
-    for keyTrad,tradValue in pairs(language[BankManager.Saved["language"]]) do
-        if tradValue == val then
-            BankManager.Saved[key] = keyTrad
-            return
-        end
-    end
-
-end
-
-
-local function getTranslateTable(arraySendingType)
-    local result = {}
-    for i,v in ipairs(arraySendingType) do
-        table.insert(result,getTranslated(v))
-    end
-    return result
-end
-
-
-local function options()
-    local textCheckBox = ""
-    local craftName, textCheckBox, othersKey
-    local LAM = LibStub("BankManager_LibAddonMenu-1.0")
-    local optionsPanel = LAM:CreateControlPanel("Bank Manager", "Bank Manager")
-    LAM:AddHeader(optionsPanel, "versionBM", "|c3366FF" .. getTranslated("version").."|r:" .. currentVersion)
-    LAM:AddHeader(optionsPanel, "headerBM", "|c3366FF" .. getTranslated("title").."|r" )
-
-    LAM:AddDropdown(optionsPanel, "languageBM", getTranslated("dropDownLanguageText"), getTranslated("dropDownLanguageTooltip"), languages,
-            function() return BankManager.Saved["language"] end,
-            changelanguage,
-            true , getTranslated("reloadWarning"))
-    
-    LAM:AddDropdown(optionsPanel, "bankChoice", "|cFF0000" .. getTranslated("bankChoice").."|r", getTranslated("bankChoiceTooltip"), getTranslateTable(banks),
-            function() return getTranslated(BankManager.Saved["bankChoice"]) end,
-            changeTranslateTable,true)
-
-
-    LAM:AddCheckbox(optionsPanel, "spamChatBM", getTranslated("spamChatText"), getTranslated("spamChatTooltip"),
-            function() return BankManager.Saved["spamChat"] end,
-            function(val) BankManager.Saved["spamChat"] = val end)
-
-
-    LAM:AddDropdown(optionsPanel, "AllBM", getTranslated("AllBM"), "", getTranslateTable(sendingType),
-            function() return getTranslated(BankManager.Saved["AllBM"]) end,
-            changeTranslateTable)
-
-    LAM:AddDropdown(optionsPanel, "fillStacks", getTranslated("fillStacks"), getTranslated("fillStacksTooltip"), getTranslateTable(sendingType),
-            function() return getTranslated(BankManager.Saved["fillStacks"]) end,
-            changeTranslateTable)
-
-
-    --CRAFT MODE
-    LAM:AddHeader(optionsPanel, "craftHeaderBM",  "|c3366FF" .. getTranslated("craftHeader").."|r")
-	for key,craftKey in pairs(craftingElements) do
-        local craftName = getTranslated(craftKey)
-        --special treatment if this is Raw Material
-        if craftKey == "CRAFTING_TYPE_RAW" then
-            --The checkbox -- #is for the conflict    
-            LAM:AddDropdown(optionsPanel, craftKey.."#", craftName, "", getTranslateTable(rawSendingType),
-            function() return getTranslated(BankManager.Saved[craftKey]) end,
-            changeTranslateTable,true,getTranslated("rawsWarning")) 
+        --We set the guild bank to work with
+        SelectGuildBank(BankManager.Saved["guildChoice"])
+        --we check the permission
+        if DoesPlayerHaveGuildPermission(BankManager.Saved["guildChoice"], GUILD_PERMISSION_BANK_DEPOSIT) and DoesPlayerHaveGuildPermission(BankManager.Saved["guildChoice"], GUILD_PERMISSION_BANK_WITHDRAW) then 
+            moveItems()
         else
-            LAM:AddDropdown(optionsPanel, craftKey.."#", craftName, "", getTranslateTable(sendingType),
-            function() return getTranslated(BankManager.Saved[craftKey]) end,
-            changeTranslateTable) 
+            d(getTranslated("noPermission"))
         end
     end
 
-    --OTHERS MODE
-    LAM:AddHeader(optionsPanel, "othersHeaderBM", "|c3366FF" .. getTranslated("othersHeader").."|r")
-    for key,othersKey in pairs(othersElements) do
-        local othersName = getTranslated(othersKey)
-
-
-        --The checkbox -- #is for the conflict 
-        LAM:AddDropdown(optionsPanel, othersKey.."#", othersName, "", getTranslateTable(sendingType),
-            function() return getTranslated(BankManager.Saved[othersKey]) end,
-            changeTranslateTable)    
-    end
 end
+
+
 
 function init(eventCode, addOnName)
-    if addOnName ~= "BankManager" then
+    if addOnName ~= BankManagerAppName then
         return
     end
+
     local initVarFalse              = NOTHING
     local defaults = {
         ["language"]                = "English",
         ["bankChoice"]              = "BAG_BANK",
+        ["guildChoice"]             = GetGuildId(1),
         ["spamChat"]                = false,
         ["AllBM"]                   = NOTHING,
         ["fillStacks"]              = NOTHING
@@ -457,13 +302,16 @@ function init(eventCode, addOnName)
     if not BankManager.Saved.bankChoice then
         BankManager.Saved.bankChoice = "BAG_BANK"
     end
+    if not BankManager.Saved.guildChoice then
+        BankManager.Saved.guildChoice = GetGuildId(1)
+    end
 
 
     options()
     
-    EVENT_MANAGER:RegisterForEvent("BankManager", EVENT_OPEN_BANK, bankOpening)
-    EVENT_MANAGER:RegisterForEvent("BankManager", EVENT_OPEN_GUILD_BANK, bankOpening)
+    EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_OPEN_BANK             , bankOpening)
+    --EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_GUILD_BANK_ITEMS_READY, bankOpening)
 end
 
 
-EVENT_MANAGER:RegisterForEvent("BankManager", EVENT_ADD_ON_LOADED, init)
+EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_ADD_ON_LOADED, init)
