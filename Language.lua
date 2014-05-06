@@ -159,7 +159,7 @@ language = {
 		BAG_GUILDBANK					= "Gildenbank",
 		guildChoice						= "Entsprechende Gildenbank",
 		noPermission					= "Du hast keine Berechtigung etwas zu entnehmen.",
-		freeSpaceRequired				= "#################",
+		freeSpaceRequired 				= "Benötigt mindestens einen freien Platz im Inventar",
         
         spamChatText                    = "Chat Spam",
         spamChatTooltip                 = "Verschobene Objekte im Chat zeigen",

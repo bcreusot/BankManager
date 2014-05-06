@@ -308,7 +308,7 @@ function init(eventCode, addOnName)
 
 
     options()
-    
+
     EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_OPEN_BANK             , bankOpening)
     --EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_GUILD_BANK_ITEMS_READY, bankOpening)
 end
