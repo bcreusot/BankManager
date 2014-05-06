@@ -1,14 +1,10 @@
 <GuiXml>
     <Controls>
-        <TopLevelControl name="BankManagerGUI">
-            <Dimensions x="50" y="150" />
-            <Anchor point="CENTER" offsetX="200" offsetY="-100"  />
-  
+        <TopLevelControl name="BankManagerUI" movable="true" mouseEnabled="true" clampedToScreen="true">
+            <Dimensions x="70" y="200" />
+            <Anchor point="CENTER" offsetX="0" offsetY="0"  />
             <Controls>
-                <Backdrop name="$(parent)BG" inherits="ZO_ThinBackdrop" />
-                <Label name="$(parent)Counter" font="ZoFontWindowTitle" color="CFDCBD" wrapMode="ELLIPSIS" verticalAlignment="CENTER" text="Counter: ">
-                    <AnchorFill />
-                </Label>
+                <Backdrop name="$(parent)BG" />
             </Controls>
         </TopLevelControl>
     </Controls>

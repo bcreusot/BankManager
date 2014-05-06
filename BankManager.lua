@@ -250,6 +250,10 @@ function bankOpening(eventCode, addOnName, isManual)
     if isManual then
         return
     end
+
+    --Display the toolbar
+    showUI()
+
     if BankManager.Saved.bankChoice == "BAG_BANK" and eventCode == EVENT_OPEN_BANK then
         ClearCursor()
         moveItems()
@@ -267,6 +271,16 @@ function bankOpening(eventCode, addOnName, isManual)
 
 end
 
+function bankClose()
+    hideUI()
+end
+
+function pushButton()
+    d("push")
+end
+function pullButton()
+    d("pull")
+end
 
 
 function init(eventCode, addOnName)
@@ -308,9 +322,13 @@ function init(eventCode, addOnName)
 
 
     options()
+    InitializeGUI()
 
-    EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_OPEN_BANK             , bankOpening)
+
+    EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_OPEN_BANK              , bankOpening)
+    EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_CLOSE_BANK             , bankClose)
     --EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_GUILD_BANK_ITEMS_READY, bankOpening)
+
 end
 
 
