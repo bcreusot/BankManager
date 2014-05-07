@@ -164,14 +164,14 @@ language = {
         --Option Translation
         version                         = "Version",
         title                           = "Bank Manager",
-        alreadyPerforming				= "",
+        alreadyPerforming				= "Ganz ruhig, ich arbeite doch schon! :)",
         reloadWarning                   = "Das Interface wird neuladen",
         
         dropDownLanguageText            = "Sprache",
         dropDownLanguageTooltip         = "Wähle deine Sprache",
 
-        toolBarDisplayed 				= "",
-		toolBarDisplayedTooltip			= "",
+        toolBarDisplayed 				= "Toolbar anzeigen",
+		toolBarDisplayedTooltip			= "Toolbar anzeigen wenn die Bank geöffnet wird",
 
 		bankChoice						= "Zielbank",
 		bankChoiceTooltip				= "Wählen Sie die Zielbank",
@@ -184,8 +184,8 @@ language = {
         spamChatText                    = "Chat Spam",
         spamChatTooltip                 = "Verschobene Objekte im Chat zeigen",
 
-		autoTransfert					= "",
-		autoTransferttooltip			= "",
+		autoTransfert 					= "Aktiviere den Auto-Transfer",
+		autoTransferttooltip			= "Aktiviert den Auto-Transfer von Gegenständen wenn die Bank geöffnet wird",
         
         AllBM                           = "Alle Objekte",
         fillStacks 						= "Stacks auffüllen",

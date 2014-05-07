@@ -4,7 +4,7 @@
 --	***** Bank Manager *****
 --	* Benjamin Creusot - Todo
 --	* 17/04/2014 
---	* v2.5.4
+--	* v2.6
 --		Manage easily your bank. Automatically places items in your bank/inventory
 --
 --  * LICENSE MIT
