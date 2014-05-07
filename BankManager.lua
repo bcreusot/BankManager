@@ -1,21 +1,33 @@
---[[
-	-------------------
-	***** Bank Manager *****
-	* Benjamin Creusot - Todo
-	* 17/04/2014 
-	* v2.5.3
-		Manage easily your bank. Automatically places items in your bank/inventory
-	-------------------
-]]--
 
+
+--------------------------------------------------------------------------------
+--	***** Bank Manager *****
+--	* Benjamin Creusot - Todo
+--	* 17/04/2014 
+--	* v2.5.4
+--		Manage easily your bank. Automatically places items in your bank/inventory
+--
+--  * LICENSE MIT
+--------------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------------------
+-- ** Function that place one item in another bag/slot **
+-- placeItems(fromBag, fromSlot, destBag, destSlot, quantity)
+-- @fromBag   : Int, Bag where the item has to come from
+-- @fromSlot  : Int, Slot where the item has to come from
+-- @destBag   : Int, Bag where the item will go
+-- @destSlot  : Int, Slot where the item will go
+-- @quantity  : int, Quantity moved
+---------------------------------------------------------------------------------------
 function placeItems(fromBag, fromSlot, destBag, destSlot, quantity)
-    --[[local fromName = GetItemName(fromBag, fromSlot)
-    local destName = GetItemName(destBag, destSlot)
-    if destName ~= nil then
-        d("(" .. fromName .. ")[" .. fromBag .. "," .. fromSlot .."] => (" .. destName .. ") [" .. destBag .. "," .. destSlot .."] (" .. quantity .. ")")
-    else
-        d("(" .. fromName .. ")[" .. fromBag .. "," .. fromSlot .."] => (nil) [" .. destBag .. "," .. destSlot .."] (" .. quantity .. ")")
-    end--]]
+    --local fromName = GetItemName(fromBag, fromSlot)
+    --local destName = GetItemName(destBag, destSlot)
+    --if destName ~= nil then
+    --    d("(" .. fromName .. ")[" .. fromBag .. "," .. fromSlot .."] => (" .. destName .. ") [" .. destBag .. "," .. destSlot .."] (" .. quantity .. ")")
+    --else
+    --    d("(" .. fromName .. ")[" .. fromBag .. "," .. fromSlot .."] => (nil) [" .. destBag .. "," .. destSlot .."] (" .. quantity .. ")")
+    --end
     ClearCursor()
     if CallSecureProtected("PickupInventoryItem", fromBag, fromSlot, quantity) then
         CallSecureProtected("PlaceInInventory", destBag, destSlot)
@@ -23,8 +35,18 @@ function placeItems(fromBag, fromSlot, destBag, destSlot, quantity)
     ClearCursor()
 end
 
-
+---------------------------------------------------------------------------------------
+-- ** Function return the state of an item regarding of the option sets **
+-- getItemState(craftingType,itemType)
+-- @craftingType  : Int,  Type of craft, describe in the API of ESO
+-- @itemType      : Int,  Type of item,  describe in the API of ESO
+-- @return        : The state of the item, NOTHING, INVENTORY_TO_BANK,BANK_TO_INVENTORY
+---------------------------------------------------------------------------------------
 local function getItemState(craftingType,itemType)
+    if BankManager.Saved.AllBM == INVENTORY_TO_BANK or BankManager.Saved.AllBM == BANK_TO_INVENTORY then
+        return BankManager.Saved.AllBM
+    end
+
     if (itemType == ITEMTYPE_BLACKSMITHING_RAW_MATERIAL or 
            itemType == ITEMTYPE_CLOTHIER_RAW_MATERIAL or
            itemType == ITEMTYPE_WOODWORKING_RAW_MATERIAL) then
@@ -45,6 +67,13 @@ local function getItemState(craftingType,itemType)
     return NOTHING
 end
 
+----------------------------------------------------------------------------------
+-- ** Function that display information in the chat about moving/stacking items **
+-- displayChat(itemName, quantity, moved)
+-- @itemName    : String,  Name of the item
+-- @quantity    : Int,     Quantity of the item
+-- @moved       : Boolean, If the item had been moved or stacked
+----------------------------------------------------------------------------------
 function displayChat(itemName, quantity, moved)
     if(counterMessageChat <= limitMessageChat) then
         local startString,endString = string.find(itemName,"%^")
@@ -62,64 +91,66 @@ function displayChat(itemName, quantity, moved)
     counterMessageChat = counterMessageChat +1
 end
 
---Return the tables of stackable items in the bag and a table of all free spots
+--------------------------------------------------------------------------------------------------------------------
+-- ** Function that parse one bag then register information about free space, stackable items and push/pull items **
+-- getBagDescription(bag,pushItems,pullItems)
+-- @bag          : Int,   The ID of the bag (BackPack,Bank,GuildBank)
+-- @pushItems    : Table, The table contains all items that have to be pushed
+-- @pullItems    : Table, The table contains all items that have to be pulled
+-- @return       :        The items stack table and the free slot avalaible of the corresponding bag
+--------------------------------------------------------------------------------------------------------------------
 local function getBagDescription(bag,pushItems,pullItems)
     --get the number of slot in the destination
     local bagIcon, bagSlots = GetBagInfo(bag)
-    --return tables of items in the bag
-    local itemsTables = {}
-    --return tables of free slots
-    local slotAvalaibleDest = {}
+    --return tables of stackable items in the bag and free slots
+    local itemsStackTable, slotAvalaibleDest = {},{}
     --iteration to get all the slots
     for slotDest = 0, bagSlots-1 do
-        local itemStack, itemMaxStack, itemName, idItem, isJunk, itemType,craftInfo
-        local item = {}
-        itemStack, itemMaxStack = GetSlotStackSize(bag, slotDest)
-        itemName  = GetItemName(bag, slotDest)
-        idItem    = GetItemInstanceId(bag, slotDest)
-        isJunk    = IsItemJunk(bag, slotDest)
-        craftInfo = GetItemCraftingInfo(bag, slotDest)
-        itemType  = GetItemType(bag, slotDest)
+        local item   = {}
+        local idItem = GetItemInstanceId(bag, slotDest)
         --if the item exist, we create it
         if idItem ~= nil then
-            item.id           = idItem
-            item.name         = itemName
-            item.stack        = itemStack
-            item.maxStack     = itemMaxStack
-            item.slot         = slotDest
-            item.bag          = bag
-            item.itemType     = itemType
-            item.craftType    = craftInfo
-            item.state        = getItemState(craftInfo,itemType)
+            item.id                    = idItem
+            item.bag                   = bag
+            item.slot                  = slotDest
+            item.name                  = GetItemName(bag, slotDest)
+            item.stack,item.maxStack   = GetSlotStackSize(bag, slotDest)
+            item.itemType              = GetItemType(bag, slotDest)
+            item.craftType             = GetItemCraftingInfo(bag, slotDest)
+            item.state                 = getItemState(item.craftType,item.itemType)
+            item.idPush                = #pushItems+1
+            item.idPull                = #pullItems+1
         end
         --if the item is not from the junk, and if the items got room for more
-        if (not isJunk) and idItem ~= nil  then
-            if itemStack < itemMaxStack then
-                itemsTables[idItem] = item
+        if (idItem ~= nil and not IsItemJunk(bag, slotDest)) then
+            if  item.stack < item.maxStack then
+                itemsStackTable[idItem] = item
             end
             --if the all option is disabled
-            if BankManager.Saved.AllBM == NOTHING then
-                if (item.state == INVENTORY_TO_BANK and bag ~= BANKS_TRANSLATION[BankManager.Saved.bankChoice]) then
-                    table.insert(pushItems,item)
-                elseif (item.state == BANK_TO_INVENTORY and bag ~= BAG_BACKPACK) then
-                    table.insert(pullItems,item)
-                end
-            --if we gotta pull everything in bank and this is not the bank :)
-            elseif BankManager.Saved.AllBM == INVENTORY_TO_BANK and bag ~= BANKS_TRANSLATION[BankManager.Saved.bankChoice] then
+            if (item.state == INVENTORY_TO_BANK and bag ~= BANKS_TRANSLATION[BankManager.Saved.bankChoice]) then
                 table.insert(pushItems,item)
-            elseif BankManager.Saved.AllBM == BANK_TO_INVENTORY and bag ~= BAG_BACKPACK then
+            elseif (item.state == BANK_TO_INVENTORY and bag ~= BAG_BACKPACK) then
                 table.insert(pullItems,item)
             end
         elseif idItem == nil then
             table.insert(slotAvalaibleDest,slotDest)
         end
     end
-    return itemsTables,slotAvalaibleDest
+    return itemsStackTable,slotAvalaibleDest
 end
 
+------------------------------------------------------------------------------------------------------------
+-- ** Function that analyze the stack of the item and the stack of the destination then stack items  **
+-- stackItems(idItem, fromTable,destTable,fromFreeSpaceTable)
+-- @idItem              : String, the ID of the element, ID are ingame value made of an object (8-9 numbers)
+-- @fromTable           : Table,  The stacking table which contains items by there ID
+-- @destTable           : Table,  The destination stacking table which contains items by there ID
+-- @fromFreeSpaceTable  : Table,  The table contains all free space from one bag
+-- @return              :         If the item has been entirely moved to his destination stack
+------------------------------------------------------------------------------------------------------------
 local function stackItems(idItem, fromTable,destTable,fromFreeSpaceTable)
-    local fromItem = fromTable[idItem]
-    local destItem = destTable[idItem]
+    local fromItem     = fromTable[idItem]
+    local destItem     = destTable[idItem]
     --If we gotta do something
     --2 case : enough place, not enough place :)
     local maxDestQuantity = destItem.maxStack - destItem.stack
@@ -134,64 +165,73 @@ local function stackItems(idItem, fromTable,destTable,fromFreeSpaceTable)
             destTable[idItem] = nil
         end
         displayChat(fromItem.name, fromItem.stack, false)
+        return true
     --no enough place
     else
         fromItem.stack = fromItem.stack - maxDestQuantity
         placeItems(fromItem.bag, fromItem.slot, destItem.bag, destItem.slot, maxDestQuantity)
         destTable[idItem] = nil
         displayChat(fromItem.name, maxDestQuantity, false)
+        return false
     end
 end
 
+---------------------------------------------------------
+-- ** First Function in the moving part of the object **
+-- moveItems(isPushSet,isPullSet)
+-- @isPushSet : Boolean, define if we have to do the push
+-- @isPullSet : Boolean, define if we have to do the pull
+---------------------------------------------------------
 function moveItems(isPushSet,isPullSet)
     -- check if the program is already performing
     assert(not flagAlreadyPerforming, getTranslated("alreadyPerforming"))
     --now it's performing :)
-    flagAlreadyPerforming = true
+          flagAlreadyPerforming                         = true
 
-    local nbItemsMove,nbItemsStack                 = 0,0
-    local pushItems,pullItems                      = {},{}
-    local bankBag                                  = BANKS_TRANSLATION[BankManager.Saved.bankChoice]
-    local backpackBag                              = BAG_BACKPACK
-    local bankItemsTable, bankFreeSlots            = {},{}
-    local inventoryItemsTable, inventoryFreeSlots  = {},{}
-    local securityCounter                          = 0
+    local nbItemsMove,nbItemsStack                      = 0,0
+    local pushItems,pullItems                           = {},{}
+    local bankBag                                       = BANKS_TRANSLATION[BankManager.Saved.bankChoice]
+    local backpackBag                                   = BAG_BACKPACK
+    local bankItemsStackTable, bankFreeSlots            = {},{}
+    local inventoryItemsStackTable, inventoryFreeSlots  = {},{}
+    local securityCounter                               = 0
+    local stackItemsRemovedPush,stackItemsRemovedPull   = 0,0
     
     --BANK ANALYZE
-    bankItemsTable,bankFreeSlots = getBagDescription(bankBag,pushItems,pullItems)
+    bankItemsStackTable,bankFreeSlots = getBagDescription(bankBag,pushItems,pullItems)
 
     --INVENTORY ANALYZE
-    inventoryItemsTable, inventoryFreeSlots = getBagDescription(backpackBag,pushItems,pullItems)
-    --[[
-
-    * MAIN ALGORITHM
-    * We will process throught each bag, one at a time and try to push or pull each items from each bag
-    * If a bag become full we skip it until it pushes an item
-    
-    ]]--
+    inventoryItemsStackTable, inventoryFreeSlots = getBagDescription(backpackBag,pushItems,pullItems)
 
     --If it's the GUILDBANK, we got a special treatment cause of the shitty system of waiting event:)
-    if BankManager.Saved.bankChoice == "BAG_GUILDBANK" and false then
-        initGuildBankManager(backpackBag,bankBag,bankItemsTable,inventoryItemsTable, inventoryFreeSlots,pushItems,pullItems)
-        return
-    end
+    --if BankManager.Saved.bankChoice == "BAG_GUILDBANK" then
+    --    initGuildBankManager(backpackBag,bankBag,bankItemsStackTable,inventoryItemsStackTable, inventoryFreeSlots,pushItems,pullItems)
+    --    return
+    --end
 
 
-    --Stacking time
-    for idItem,itemBank in pairs(bankItemsTable) do
+    --Stacking time, we run the inventory because statistically there is more chance that the inventory contains less items that the bank
+    for idItem,itemInventory in pairs(inventoryItemsStackTable) do
         --If the items is present in the dest
-        if inventoryItemsTable[idItem] then
-            --3 possibilites : NOTHING, Stack in Bank, Stack in Inventory
-            if ((itemBank.state == INVENTORY_TO_BANK or BankManager.Saved.AllBM == INVENTORY_TO_BANK) and isPushSet) then
-                --Stacking items (by reference) - idItem-fromTable-destTable-fromFreeSpace
-                stackItems(idItem,inventoryItemsTable,bankItemsTable,inventoryFreeSlots)
-            elseif ((itemBank.state == BANK_TO_INVENTORY or BankManager.Saved.AllBM == BANK_TO_INVENTORY) and isPullSet) then
-                stackItems(idItem,bankItemsTable,inventoryItemsTable,bankFreeSlots)
-            --We consider here that the item  has no specific place to go
-            elseif ((BankManager.Saved["fillStacks"] == INVENTORY_TO_BANK) and isPushSet) then
-                stackItems(idItem,inventoryItemsTable,bankItemsTable,inventoryFreeSlots)
-            elseif ((BankManager.Saved["fillStacks"] == BANK_TO_INVENTORY) and isPullSet) then
-                stackItems(idItem,bankItemsTable,inventoryItemsTable,bankFreeSlots)
+        if bankItemsStackTable[idItem] then
+            local itemState   = itemInventory.state
+            local globalState = BankManager.Saved.AllBM
+            local idPush      = inventoryItemsStackTable[idItem].idPush
+            local idPull      = bankItemsStackTable[idItem].idPull
+
+            --PUSH STACKING
+            if (isPushSet and (itemState == INVENTORY_TO_BANK or BankManager.Saved["fillStacks"] == INVENTORY_TO_BANK)) then
+                -- The item has been completely stack ! We gotta remove it from the push table
+                if stackItems(idItem,inventoryItemsStackTable,bankItemsStackTable,inventoryFreeSlots) then
+                    table.remove(pushItems,idPush - stackItemsRemovedPush)
+                    stackItemsRemovedPush = stackItemsRemovedPush + 1
+                end
+            --Same rule but for TO_INVENTORY
+            elseif (isPullSet and (itemState == BANK_TO_INVENTORY or BankManager.Saved["fillStacks"] == BANK_TO_INVENTORY)) then
+                if stackItems(idItem,bankItemsStackTable,inventoryItemsStackTable,bankFreeSlots) then
+                    table.remove(pullItems,idPull - stackItemsRemovedPull)
+                    stackItemsRemovedPull = stackItemsRemovedPull + 1
+                end
             end
             nbItemsStack = nbItemsStack + 1
         end
@@ -206,16 +246,16 @@ function moveItems(isPushSet,isPullSet)
         if isPushSet then
             for k,item in pairs(pushItems) do
                 --if the items was already stack (secure for maxStack items that are not registered at all)
-                if not inventoryItemsTable[item.id] and item.stack < item.maxStack then
-                    table.remove(pushItems,k)
+                --if not inventoryItemsStackTable[item.id] and item.stack < item.maxStack then
+                --    table.remove(pushItems,k)
                 -- if there is a place in the bank at least
-                elseif next(bankFreeSlots) ~= nil then
+                if next(bankFreeSlots) ~= nil then
                     placeItems(item.bag, item.slot, BANKS_TRANSLATION[BankManager.Saved.bankChoice], table.remove(bankFreeSlots), item.stack)
                     --new place in bank
                     table.insert(inventoryFreeSlots,item.slot)
-                    displayChat(item.name, item.stack, true)
-                    nbItemsMove  = nbItemsMove + 1
                     table.remove(pushItems,k)
+                    nbItemsMove  = nbItemsMove + 1
+                    displayChat(item.name, item.stack, true)
                 --if not there is no point to continue
                 else
                     break
@@ -225,15 +265,15 @@ function moveItems(isPushSet,isPullSet)
         --pull time
         if isPullSet then
             for k,item in pairs(pullItems) do
-                if not bankItemsTable[item.id] and item.stack < item.maxStack then
-                    table.remove(pullItems,k)
-                elseif next(inventoryFreeSlots) ~= nil then
+                --if not bankItemsStackTable[item.id] and item.stack < item.maxStack then
+                --    table.remove(pullItems,k)
+                if next(inventoryFreeSlots) ~= nil then
                     placeItems(item.bag, item.slot, BAG_BACKPACK, table.remove(inventoryFreeSlots), item.stack)
                     --new place in bank
                     table.insert(bankFreeSlots,item.slot)
-                    displayChat(item.name, item.stack, true)
-                    nbItemsMove  = nbItemsMove + 1
                     table.remove(pullItems,k)
+                    nbItemsMove  = nbItemsMove + 1
+                    displayChat(item.name, item.stack, true)
                 else
                     break
                 end
@@ -259,6 +299,14 @@ function moveItems(isPushSet,isPullSet)
     flagAlreadyPerforming = false
 end
 
+
+---------------------------------------------------------------------------
+-- ** Function called when the events are raised **
+-- bankOpening(eventCode, addOnName, isManual)
+-- @eventCode : Int,     Code of the event
+-- @addOnName : String,  Name of the addon
+-- @isManual  : Boolean, If the function was not launch by us... I guess :)
+---------------------------------------------------------------------------
 function bankOpening(eventCode, addOnName, isManual)
     if isManual then
         return
@@ -278,11 +326,11 @@ function bankOpening(eventCode, addOnName, isManual)
         ClearCursor()
         moveItems(true,true)
     elseif BankManager.Saved.bankChoice == "BAG_GUILDBANK" and eventCode == EVENT_GUILD_BANK_ITEMS_READY  and BankManager.Saved["guildChoice"] then
-        ClearCursor()
         --We set the guild bank to work with
-        SelectGuildBank(BankManager.Saved["guildChoice"])
         --we check the permission
         if DoesPlayerHaveGuildPermission(BankManager.Saved["guildChoice"], GUILD_PERMISSION_BANK_DEPOSIT) and DoesPlayerHaveGuildPermission(BankManager.Saved["guildChoice"], GUILD_PERMISSION_BANK_WITHDRAW) then 
+            SelectGuildBank(BankManager.Saved["guildChoice"])
+            ClearCursor()
             moveItems(true,true)
         else
             d(getTranslated("noPermission"))
@@ -291,11 +339,20 @@ function bankOpening(eventCode, addOnName, isManual)
 
 end
 
+------------------------------------------------
+-- ** Function called when the bank is closed **
+-- bankClose()
+------------------------------------------------
 function bankClose()
     hideUI()
 end
 
-
+------------------------------------------
+-- ** Init Function **
+-- init(eventCode, addOnName)
+-- @eventCode : Int,     Code of the event
+-- @addOnName : String,  Name of the addon
+------------------------------------------
 function init(eventCode, addOnName)
     if addOnName ~= BankManagerAppName then
         return
@@ -303,7 +360,7 @@ function init(eventCode, addOnName)
 
     local initVarFalse              = NOTHING
     local defaults = {
-        ["language"]                = "English",
+        ["language"]                = getBaseLanguage(),
         ["toolBarDisplayed"]        = true,
         ["bankChoice"]              = "BAG_BANK",
         ["guildChoice"]             = GetGuildId(1),

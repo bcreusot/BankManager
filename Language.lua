@@ -1,4 +1,6 @@
 
+
+
 language = {
 	
 	English = {
@@ -242,3 +244,14 @@ language = {
 function getTranslated(text)
     return language[BankManager.Saved["language"]][text]
 end
+
+function getBaseLanguage()
+	local errorString = GetErrorString(16)
+	if (errorString == "Ziel aus dem Gleichgewicht") then
+		return "Deutsch"
+	elseif (errorString == "Cible \195\169tourdie") then
+		return "Francais"
+	else
+		return "English"
+	end
+end 
