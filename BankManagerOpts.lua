@@ -62,6 +62,10 @@ function options()
             changelanguage,
             true , getTranslated("reloadWarning"))
     
+    LAM:AddCheckbox(optionsPanel, "toolBarDisplayedBM", getTranslated("toolBarDisplayed"), getTranslated("toolBarDisplayedTooltip"),
+            function() return BankManager.Saved["toolBarDisplayed"] end,
+            function(val) BankManager.Saved["toolBarDisplayed"] = val end)
+    
     LAM:AddDropdown(optionsPanel, "bankChoice", "|cFF0000" .. getTranslated("bankChoice").."|r", getTranslated("bankChoiceTooltip"), getTranslateTable(banks),
             function() return getTranslated(BankManager.Saved["bankChoice"]) end,
             changeTranslateTable,true,"NOT WORKING")
@@ -69,6 +73,11 @@ function options()
     LAM:AddDropdown(optionsPanel, "guildChoice", getTranslated("guildChoice"), getTranslated("guildChoice"), getGuildList(),
             function() return GetGuildName(BankManager.Saved["guildChoice"]) end,
             changeGuild)
+
+    LAM:AddCheckbox(optionsPanel, "autoTransfertBM", getTranslated("autoTransfert"), getTranslated("autoTransfertTooltip"),
+            function() return BankManager.Saved["autoTransfert"] end,
+            function(val) BankManager.Saved["autoTransfert"] = val end)
+
 
     LAM:AddCheckbox(optionsPanel, "spamChatBM", getTranslated("spamChatText"), getTranslated("spamChatTooltip"),
             function() return BankManager.Saved["spamChat"] end,

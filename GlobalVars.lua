@@ -16,6 +16,9 @@ languages = {
     "Deutsch"
 }
 
+flagAlreadyPerforming = false
+
+
 NOTHING             = "NOTHING"
 BANK_TO_INVENTORY   = "BANK_TO_INVENTORY"
 INVENTORY_TO_BANK   = "INVENTORY_TO_BANK"

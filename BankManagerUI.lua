@@ -43,7 +43,7 @@ function InitializeGUI()
 	BankManagerUI:SetAnchor( CENTER, GuiRoot, CENTER, 185 , -10 )
 	BankManagerUI:SetWidth ( 70 )
 	BankManagerUI:SetHeight( 300 )
-	BankManagerUI:SetHidden(false)
+	BankManagerUI:SetHidden(true)
 
 	BankManagerUIBG:SetAnchor(TOPLEFT, BankManagerUI, TOPLEFT, 0, 0)
 	BankManagerUIBG:SetAnchorFill(BankManagerUI)
@@ -69,4 +69,13 @@ function showUI()
 end
 function hideUI()
 	BankManagerUI:SetHidden(true)
+end
+
+function pushButton()
+	d("push")
+	moveItems(true,false)
+end
+function pullButton()
+	d("pull")
+	moveItems(false,true)
 end

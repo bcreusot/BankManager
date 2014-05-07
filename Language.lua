@@ -5,10 +5,14 @@ language = {
 		--Option Translation
 		version							= "Version",
 		title							= "Bank Manager",
+		alreadyPerforming				= "Calm Down buddy :), It's performing!",
 		reloadWarning					= "The UI will reload",
 		
 		dropDownLanguageText			= "Language",
 		dropDownLanguageTooltip			= "Select your language",
+
+		toolBarDisplayed 				= "Display the toolBar",
+		toolBarDisplayedTooltip			= "Display the toolbar when opening the Bank",
 		
 		bankChoice						= "Target Bank",
 		bankChoiceTooltip				= "Select the Target Bank",
@@ -20,6 +24,9 @@ language = {
 
 		spamChatText					= "Chat Spam",
 		spamChatTooltip					= "Display moved items in the chat",
+
+		autoTransfert					= "Activate the Auto-Transfert",
+		autoTransferttooltip			= "Activate the Auto-Transfert of items when the bank is opened",
 		
 		AllBM      						= "All items",
 		fillStacks						= "Fill Stacks",
@@ -76,10 +83,14 @@ language = {
 		--Traduction dans les options
 		version							= "Version",
 		title							= "Bank Manager",
+		alreadyPerforming				= "Pas de spam coquin ! :)",
 		reloadWarning					= "L'affichage va recharger",
 
 		dropDownLanguageText			= "Langue",
 		dropDownLanguageTooltip			= "Selectionnez votre langue",
+
+		toolBarDisplayed 				= "Affiche la toolbar",
+		toolBarDisplayedTooltip			= "Affiche la toolbar quand la banque s'ouvre",
 		
 		bankChoice						= "Banque cible",
 		bankChoiceTooltip				= "Selectionner la banque cible",
@@ -92,6 +103,9 @@ language = {
 
 		spamChatText					= "Spam du chat",
 		spamChatTooltip					= "Affiche les items deplacés dans le chat",
+
+		autoTransfert					= "Activer le transfert automatique",
+		autoTransferttooltip			= "Activer le transfert automatique d'objets quand la banque s'ouvre",
 
 		AllBM 							= "Envoyer tout",
 		fillStacks						= "Completer les tas",
@@ -148,10 +162,14 @@ language = {
         --Option Translation
         version                         = "Version",
         title                           = "Bank Manager",
+        alreadyPerforming				= "",
         reloadWarning                   = "Das Interface wird neuladen",
         
         dropDownLanguageText            = "Sprache",
         dropDownLanguageTooltip         = "Wähle deine Sprache",
+
+        toolBarDisplayed 				= "",
+		toolBarDisplayedTooltip			= "",
 
 		bankChoice						= "Zielbank",
 		bankChoiceTooltip				= "Wählen Sie die Zielbank",
@@ -163,6 +181,9 @@ language = {
         
         spamChatText                    = "Chat Spam",
         spamChatTooltip                 = "Verschobene Objekte im Chat zeigen",
+
+		autoTransfert					= "",
+		autoTransferttooltip			= "",
         
         AllBM                           = "Alle Objekte",
         fillStacks 						= "Stacks auffüllen",
