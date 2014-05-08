@@ -118,19 +118,20 @@ local function getBagDescription(bag,pushItems,pullItems)
             item.itemType              = GetItemType(bag, slotDest)
             item.craftType             = GetItemCraftingInfo(bag, slotDest)
             item.state                 = getItemState(item.craftType,item.itemType)
-            item.idPush                = #pushItems+1
-            item.idPull                = #pullItems+1
         end
         --if the item is not from the junk, and if the items got room for more
         if (idItem ~= nil and not IsItemJunk(bag, slotDest)) then
-            if  item.stack < item.maxStack then
-                itemsStackTable[idItem] = item
-            end
             --if the all option is disabled
             if (item.state == INVENTORY_TO_BANK and bag ~= BANKS_TRANSLATION[BankManager.Saved.bankChoice]) then
+                item.idPushPull = #pushItems+1
                 table.insert(pushItems,item)
             elseif (item.state == BANK_TO_INVENTORY and bag ~= BAG_BACKPACK) then
+                item.idPushPull = #pullItems+1
                 table.insert(pullItems,item)
+            end
+
+            if  item.stack < item.maxStack then
+                itemsStackTable[idItem] = item
             end
         elseif idItem == nil then
             table.insert(slotAvalaibleDest,slotDest)
@@ -195,7 +196,6 @@ function moveItems(isPushSet,isPullSet)
     local bankItemsStackTable, bankFreeSlots            = {},{}
     local inventoryItemsStackTable, inventoryFreeSlots  = {},{}
     local securityCounter                               = 0
-    local stackItemsRemovedPush,stackItemsRemovedPull   = 0,0
     
     --BANK ANALYZE
     bankItemsStackTable,bankFreeSlots = getBagDescription(bankBag,pushItems,pullItems)
@@ -216,24 +216,23 @@ function moveItems(isPushSet,isPullSet)
         if bankItemsStackTable[idItem] then
             local itemState   = itemInventory.state
             local globalState = BankManager.Saved.AllBM
-            local idPush      = inventoryItemsStackTable[idItem].idPush
-            local idPull      = bankItemsStackTable[idItem].idPull
+            local idPush      = inventoryItemsStackTable[idItem].idPushPull
+            local idPull      = bankItemsStackTable[idItem].idPushPull
 
             --PUSH STACKING
             if (isPushSet and (itemState == INVENTORY_TO_BANK or BankManager.Saved["fillStacks"] == INVENTORY_TO_BANK)) then
                 -- The item has been completely stack ! We gotta remove it from the push table
                 if stackItems(idItem,inventoryItemsStackTable,bankItemsStackTable,inventoryFreeSlots) then
-                    table.remove(pushItems,idPush - stackItemsRemovedPush)
-                    stackItemsRemovedPush = stackItemsRemovedPush + 1
+                    pushItems[idPush] = nil
                 end
+                nbItemsStack = nbItemsStack + 1
             --Same rule but for TO_INVENTORY
             elseif (isPullSet and (itemState == BANK_TO_INVENTORY or BankManager.Saved["fillStacks"] == BANK_TO_INVENTORY)) then
                 if stackItems(idItem,bankItemsStackTable,inventoryItemsStackTable,bankFreeSlots) then
-                    table.remove(pullItems,idPull - stackItemsRemovedPull)
-                    stackItemsRemovedPull = stackItemsRemovedPull + 1
+                    pullItems[idPull] = nil
                 end
+                nbItemsStack = nbItemsStack + 1
             end
-            nbItemsStack = nbItemsStack + 1
         end
     end
 
