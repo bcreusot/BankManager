@@ -14,8 +14,11 @@ local PUSH   = {
 	texture 		= TEXTURE_PUSH_BUTTON,
 	texturePressed  = TEXTURE_PUSH_BUTTON_PRESSED,
 	func    		= function ()
-						moveItems(true,false)
-			  		end
+			            local status,err = pcall(moveItems,true,false)
+			            if not status then
+			                cleanAll(err)
+			            end
+			        end
 }
 local PULL   = {
 	id      		= "_PULL",
@@ -23,8 +26,11 @@ local PULL   = {
 	texture 		= TEXTURE_PULL_BUTTON,
 	texturePressed  = TEXTURE_PULL_BUTTON_PRESSED,
 	func    		= function ()
-						moveItems(false,true)
-			  		end
+			            local status,err = pcall(moveItems,false,true)
+			            if not status then
+			                cleanAll(err)
+			            end
+			        end
 }
 
 local toolBarOptions ={

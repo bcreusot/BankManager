@@ -4,7 +4,7 @@
 --	***** Bank Manager *****
 --	* Benjamin Creusot - Todo
 --	* 17/04/2014 
---	* v2.6.1
+--	* v2.6.2
 --		Manage easily your bank. Automatically places items in your bank/inventory
 --
 --  * LICENSE MIT
@@ -187,7 +187,7 @@ function moveItems(isPushSet,isPullSet)
     -- check if the program is already performing
     assert(not flagAlreadyPerforming, getTranslated("alreadyPerforming"))
     --now it's performing :)
-          flagAlreadyPerforming                         = true
+    flagAlreadyPerforming = true
 
     local nbItemsMove,nbItemsStack                      = 0,0
     local pushItems,pullItems                           = {},{}
@@ -222,13 +222,13 @@ function moveItems(isPushSet,isPullSet)
             --PUSH STACKING
             if (isPushSet and (itemState == INVENTORY_TO_BANK or BankManager.Saved["fillStacks"] == INVENTORY_TO_BANK)) then
                 -- The item has been completely stack ! We gotta remove it from the push table
-                if stackItems(idItem,inventoryItemsStackTable,bankItemsStackTable,inventoryFreeSlots) then
+                if stackItems(idItem,inventoryItemsStackTable,bankItemsStackTable,inventoryFreeSlots) and not BankManager.Saved["fillStacks"] == INVENTORY_TO_BANK then
                     pushItems[idPush] = nil
                 end
                 nbItemsStack = nbItemsStack + 1
             --Same rule but for TO_INVENTORY
             elseif (isPullSet and (itemState == BANK_TO_INVENTORY or BankManager.Saved["fillStacks"] == BANK_TO_INVENTORY)) then
-                if stackItems(idItem,bankItemsStackTable,inventoryItemsStackTable,bankFreeSlots) then
+                if stackItems(idItem,bankItemsStackTable,inventoryItemsStackTable,bankFreeSlots) and not BankManager.Saved["fillStacks"] == BANK_TO_INVENTORY then
                     pullItems[idPull] = nil
                 end
                 nbItemsStack = nbItemsStack + 1
@@ -323,14 +323,20 @@ function bankOpening(eventCode, addOnName, isManual)
 
     if BankManager.Saved.bankChoice == "BAG_BANK" and eventCode == EVENT_OPEN_BANK then
         ClearCursor()
-        moveItems(true,true)
+        local status,err = pcall(moveItems,true,true)
+        if not status then
+            cleanAll(err)
+        end
     elseif BankManager.Saved.bankChoice == "BAG_GUILDBANK" and eventCode == EVENT_GUILD_BANK_ITEMS_READY  and BankManager.Saved["guildChoice"] then
         --We set the guild bank to work with
         --we check the permission
         if DoesPlayerHaveGuildPermission(BankManager.Saved["guildChoice"], GUILD_PERMISSION_BANK_DEPOSIT) and DoesPlayerHaveGuildPermission(BankManager.Saved["guildChoice"], GUILD_PERMISSION_BANK_WITHDRAW) then 
             SelectGuildBank(BankManager.Saved["guildChoice"])
             ClearCursor()
-            moveItems(true,true)
+            local status,err = pcall(moveItems,true,true)
+            if not status then
+                cleanAll(err)
+            end
         else
             d(getTranslated("noPermission"))
         end
@@ -344,6 +350,17 @@ end
 ------------------------------------------------
 function bankClose()
     hideUI()
+end
+---------------------------------------------------------------------------
+-- ** Function called when an error is catch on the main loop, moveItems **
+-- cleanAll(err)
+-- @err the error catch
+---------------------------------------------------------------------------
+function cleanAll(err)
+    counterMessageChat    = 0
+    flagAlreadyPerforming = false
+    --I have to print the error with the INGame system for a better communication between users and me
+    assert(false,err)
 end
 
 ------------------------------------------
