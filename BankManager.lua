@@ -4,7 +4,7 @@
 --	***** Bank Manager *****
 --	* Benjamin Creusot - Todo
 --	* 17/04/2014 
---	* v2.6.2
+--	* v2.6.3
 --		Manage easily your bank. Automatically places items in your bank/inventory
 --
 --  * LICENSE MIT
@@ -28,6 +28,8 @@ function placeItems(fromBag, fromSlot, destBag, destSlot, quantity)
     --else
     --    d("(" .. fromName .. ")[" .. fromBag .. "," .. fromSlot .."] => (nil) [" .. destBag .. "," .. destSlot .."] (" .. quantity .. ")")
     --end
+    --d(GetItemQualityColor(fromBag,fromSlot))
+
     ClearCursor()
     if CallSecureProtected("PickupInventoryItem", fromBag, fromSlot, quantity) then
         CallSecureProtected("PlaceInInventory", destBag, destSlot)
@@ -252,7 +254,7 @@ function moveItems(isPushSet,isPullSet)
                     placeItems(item.bag, item.slot, BANKS_TRANSLATION[BankManager.Saved.bankChoice], table.remove(bankFreeSlots), item.stack)
                     --new place in bank
                     table.insert(inventoryFreeSlots,item.slot)
-                    table.remove(pushItems,k)
+                    pushItems[k] = nil
                     nbItemsMove  = nbItemsMove + 1
                     displayChat(item.name, item.stack, true)
                 --if not there is no point to continue
@@ -270,7 +272,7 @@ function moveItems(isPushSet,isPullSet)
                     placeItems(item.bag, item.slot, BAG_BACKPACK, table.remove(inventoryFreeSlots), item.stack)
                     --new place in bank
                     table.insert(bankFreeSlots,item.slot)
-                    table.remove(pullItems,k)
+                    pullItems[k] = nil
                     nbItemsMove  = nbItemsMove + 1
                     displayChat(item.name, item.stack, true)
                 else
