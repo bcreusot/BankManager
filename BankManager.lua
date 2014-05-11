@@ -222,13 +222,13 @@ function moveItems(isPushSet,isPullSet)
             --PUSH STACKING
             if (isPushSet and (itemState == INVENTORY_TO_BANK or BankManager.Saved["fillStacks"] == INVENTORY_TO_BANK)) then
                 -- The item has been completely stack ! We gotta remove it from the push table
-                if stackItems(idItem,inventoryItemsStackTable,bankItemsStackTable,inventoryFreeSlots) and not BankManager.Saved["fillStacks"] == INVENTORY_TO_BANK then
+                if stackItems(idItem,inventoryItemsStackTable,bankItemsStackTable,inventoryFreeSlots) and itemState == INVENTORY_TO_BANK then
                     pushItems[idPush] = nil
                 end
                 nbItemsStack = nbItemsStack + 1
             --Same rule but for TO_INVENTORY
             elseif (isPullSet and (itemState == BANK_TO_INVENTORY or BankManager.Saved["fillStacks"] == BANK_TO_INVENTORY)) then
-                if stackItems(idItem,bankItemsStackTable,inventoryItemsStackTable,bankFreeSlots) and not BankManager.Saved["fillStacks"] == BANK_TO_INVENTORY then
+                if stackItems(idItem,bankItemsStackTable,inventoryItemsStackTable,bankFreeSlots) and itemState == BANK_TO_INVENTORY then
                     pullItems[idPull] = nil
                 end
                 nbItemsStack = nbItemsStack + 1
