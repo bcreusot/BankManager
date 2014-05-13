@@ -8,7 +8,7 @@ currentVersion     = "v2.6.3"
 BankManager = {}
 --Limit the number of message in the chat to avoid spamming detection by the game
 counterMessageChat = 0
-limitMessageChat   = 30
+limitMessageChat   = 20
 
 languages = {
     "English",

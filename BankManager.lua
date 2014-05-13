@@ -28,8 +28,6 @@ function placeItems(fromBag, fromSlot, destBag, destSlot, quantity)
     --else
     --    d("(" .. fromName .. ")[" .. fromBag .. "," .. fromSlot .."] => (nil) [" .. destBag .. "," .. destSlot .."] (" .. quantity .. ")")
     --end
-    --d(GetItemQualityColor(fromBag,fromSlot))
-
     ClearCursor()
     if CallSecureProtected("PickupInventoryItem", fromBag, fromSlot, quantity) then
         CallSecureProtected("PlaceInInventory", destBag, destSlot)
@@ -69,25 +67,54 @@ local function getItemState(craftingType,itemType)
     return NOTHING
 end
 
+--------------------------------------------------------------------------------------
+-- ** Function that transfor RGB table into HEX - Thanks to marceloCodget on Github **
+-- rgbToHex(rgb)
+-- @rgb     : Table,  table like {0.255, 0.100, 0.020}
+-- @return  : String, String of the Hex value
+----------------------------------------------------------------------------------
+local function rgbToHex(rgb)
+    local hexadecimal = ''
+    for key, value in pairs(rgb) do
+        value = value * 255
+        local hex = ''
+        while(value > 0)do
+            local index = math.fmod(value, 16) + 1
+            value = math.floor(value / 16)
+            hex = string.sub('0123456789ABCDEF', index, index) .. hex           
+        end
+        if(string.len(hex) == 0)then
+            hex = '00'
+        elseif(string.len(hex) == 1)then
+            hex = '0' .. hex
+        end
+        hexadecimal = hexadecimal .. hex
+    end
+    return hexadecimal
+end
+
 ----------------------------------------------------------------------------------
 -- ** Function that display information in the chat about moving/stacking items **
 -- displayChat(itemName, quantity, moved)
 -- @itemName    : String,  Name of the item
 -- @quantity    : Int,     Quantity of the item
 -- @moved       : Boolean, If the item had been moved or stacked
+-- @rgb         : Table,   Table of RGB colors
 ----------------------------------------------------------------------------------
-function displayChat(itemName, quantity, moved)
+function displayChat(itemName, quantity, moved, rgb)
     if(counterMessageChat <= limitMessageChat) then
         local startString,endString = string.find(itemName,"%^")
+        local ending                = ""
         if startString ~= nil then
             itemName = string.sub(itemName,0,startString-1)
         end
         if BankManager.Saved["spamChat"] then
             if moved then
-                d(quantity .. " " .. itemName .. " " .. getTranslated("itemsMoved"))
+                ending = getTranslated("itemsMoved")
             else
-                d(quantity .. " " .. itemName .. " " .. getTranslated("itemsStacked"))
+                ending = getTranslated("itemsStacked")
             end
+            d("|c".. rgbToHex(rgb) .. "[".. itemName .. "]|r " .. "(x" .. quantity .. ") " .. ending)
         end
     end
     counterMessageChat = counterMessageChat +1
@@ -108,8 +135,9 @@ local function getBagDescription(bag,pushItems,pullItems)
     local itemsStackTable, slotAvalaibleDest = {},{}
     --iteration to get all the slots
     for slotDest = 0, bagSlots-1 do
-        local item   = {}
-        local idItem = GetItemInstanceId(bag, slotDest)
+        local item                              = {}
+        local idItem                            = GetItemInstanceId(bag, slotDest)
+        local _, _, _, _, _, _, _, itemQuality  = GetItemInfo(bag, slotDest)
         --if the item exist, we create it
         if idItem ~= nil then
             item.id                    = idItem
@@ -120,6 +148,7 @@ local function getBagDescription(bag,pushItems,pullItems)
             item.itemType              = GetItemType(bag, slotDest)
             item.craftType             = GetItemCraftingInfo(bag, slotDest)
             item.state                 = getItemState(item.craftType,item.itemType)
+            item.quality               = itemQuality
         end
         --if the item is not from the junk, and if the items got room for more
         if (idItem ~= nil and not IsItemJunk(bag, slotDest)) then
@@ -167,14 +196,17 @@ local function stackItems(idItem, fromTable,destTable,fromFreeSpaceTable)
         if destItem.stack == destItem.maxStack then
             destTable[idItem] = nil
         end
-        displayChat(fromItem.name, fromItem.stack, false)
+
+        local argb = GetItemQualityColor(fromItem.quality)
+        displayChat(fromItem.name, fromItem.stack, false, {argb.r,argb.g,argb.b})
         return true
     --no enough place
     else
         fromItem.stack = fromItem.stack - maxDestQuantity
         placeItems(fromItem.bag, fromItem.slot, destItem.bag, destItem.slot, maxDestQuantity)
         destTable[idItem] = nil
-        displayChat(fromItem.name, maxDestQuantity, false)
+        local argb = GetItemQualityColor(fromItem.quality)
+        displayChat(fromItem.name, maxDestQuantity, false,{argb.r,argb.g,argb.b})
         return false
     end
 end
@@ -256,7 +288,8 @@ function moveItems(isPushSet,isPullSet)
                     table.insert(inventoryFreeSlots,item.slot)
                     pushItems[k] = nil
                     nbItemsMove  = nbItemsMove + 1
-                    displayChat(item.name, item.stack, true)
+                    local argb = GetItemQualityColor(item.quality)
+                    displayChat(item.name, item.stack, true,{argb.r,argb.g,argb.b})
                 --if not there is no point to continue
                 else
                     break
@@ -274,7 +307,8 @@ function moveItems(isPushSet,isPullSet)
                     table.insert(bankFreeSlots,item.slot)
                     pullItems[k] = nil
                     nbItemsMove  = nbItemsMove + 1
-                    displayChat(item.name, item.stack, true)
+                    local argb = GetItemQualityColor(item.quality)
+                    displayChat(item.name, item.stack, true,{argb.r,argb.g,argb.b})
                 else
                     break
                 end
