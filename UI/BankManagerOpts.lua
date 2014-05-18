@@ -168,8 +168,9 @@ function options()
             setProfilesNb,
             true , getTranslated("reloadWarning"))
 
+    --Small note : if we decrease the number of avalaible profils we must check that the default profil name is not one of the unaccessible profils
     LAM:AddDropdown(optionsPanel, "defaultProfileBM", getTranslated("defaultProfile"), getTranslated("defaultProfileTooltip"), getProfilesNames(),
-            function() return getProfileName(BankManager.Saved["defaultProfile"]) end,
+            function() return getProfileName(tonumber(BankManager.Saved["defaultProfile"]) <= tonumber(BankManager.Saved["profilesNb"]) and BankManager.Saved["defaultProfile"] or 1) end,
             setDefaultProfile)
 
     --Profile Mode !
