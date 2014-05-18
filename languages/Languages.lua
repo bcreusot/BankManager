@@ -1,6 +1,4 @@
 
-
-
 language = {
 	
 	English = {
@@ -21,22 +19,35 @@ language = {
 		BAG_BANK						= "Bank",
 		BAG_GUILDBANK					= "Guild Bank",
 		guildChoice						= "Guild Bank to work with",
-		noPermission					= "You haven't got the permission to withdraw/draw",
-		freeSpaceRequired				= "Required at least one free space in inventory",
+		noPermission					= "You don't have permission to deposit/withdraw",
+		freeSpaceRequired				= "Requires at least one free space in inventory",
 
-		spamChatText					= "Chat Spam",
-		spamChatTooltip					= "Display moved items in the chat",
+		spamChatText					= "Detailed Moved/Stacked items",
+		spamChatTooltip					= "Display details of each item moved in chat",
+		spamChatAllText					= "Hide Summary",
+		spamChatAllTextTooltip			= "Hide the summary of the number of moved/stacked items",
 
-		autoTransfert					= "Activate the Auto-Transfert",
-		autoTransferttooltip			= "Activate the Auto-Transfert of items when the bank is opened",
+		autoTransfert					= "Enable Auto-Transfer",
+		autoTransferttooltip			= "Enable Auto-Transfer of items when the bank is opened",
+
+		profilesNb						= "Number of profiles",
+		profilesNbTooltip				= "Max number of profiles you can define",
+		profile							= "Profile",
+		defaultProfile					= "Default Profile",
+		defaultProfileToolTip			= "Default Profile when opening the bank if the Auto-Transfer is enabled",
+		profileName						= "Profile Name",
+		profileNameTooltip				= "Enter the profile name",
+
+		subMenuRulesButton				= "Deposit/Withdraw",
+		subMenuRulesButtonTooltip 		= "Set the rules for this profile",
 		
 		AllBM      						= "All items",
 		fillStacks						= "Fill Stacks",
-		fillStacksTooltip				= "Fill uncomplete stacks for optionless items",
+		fillStacksTooltip				= "Fill incomplete stacks for unassigned items",
 		
-		NOTHING	 						= "Nothing",
-		BANK_TO_INVENTORY				= "Pull to Inventory",
-		INVENTORY_TO_BANK				= "Push to Bank",
+		NOTHING	 						= "-",
+		BANK_TO_INVENTORY				= "Transfer to Inventory",
+		INVENTORY_TO_BANK				= "Transfer to Bank",
 		MATCH_CRAFT						= "Match the corresponding craft",
 		
 		noDisplayed						= "messages not displayed",
@@ -53,7 +64,7 @@ language = {
 		CRAFTING_TYPE_PROVISIONING		= "Provisioning",
 		CRAFTING_TYPE_WOODWORKING		= "Woodworking",
 		CRAFTING_TYPE_RAW				= "Raw Materials",
-		rawsWarning						= "Raws won't move if this option is set to None",
+		rawsWarning						= "Raws won't move if this option is set to - \n<<Match>> will apply the same rule you set for each type of craft on their corresponding raws",
 		ITEMTYPE_STYLE_MATERIAL			= "Style Materials",			
 		ITEMTYPE_WEAPON_TRAIT			= "Weapon Traits",			
 		ITEMTYPE_ARMOR_TRAIT			= "Armor Traits",			
@@ -103,17 +114,30 @@ language = {
 		freeSpaceRequired				= "Requiert au moins un espace libre dans l'inventaire",
 
 
-		spamChatText					= "Spam du chat",
+		spamChatText					= "Affiche le detail",
 		spamChatTooltip					= "Affiche les items deplacés dans le chat",
+		spamChatAllText					= "Cache le sommaire",
+		spamChatAllTextTooltip			= "Cache le sommaire montrant le nombre d'objets deplacés/stackés",
 
 		autoTransfert					= "Activer le transfert automatique",
 		autoTransferttooltip			= "Activer le transfert automatique d'objets quand la banque s'ouvre",
+
+		profilesNb						= "Nombre de profils",
+		profilesNbTooltip				= "Nombre maximum de profils definissables",
+		profile							= "Profil",
+		defaultProfile					= "Profil par défaut",
+		defaultProfileToolTip			= "Profil par défaut à l'ouverture de la banque si le Transfert Auto est activé",
+		profileName						= "Nom du profil",
+		profileNameTooltip				= "Entrez le nom du profil",
+
+		subMenuRulesButton				= "Deposer/Envoyer",
+		subMenuRulesButtonTooltip 		= "Definit les règles pour ce profil",
 
 		AllBM 							= "Envoyer tout",
 		fillStacks						= "Completer les tas",
 		fillStacksTooltip				= "Completer les tas non spécifiés par les options en dessous",
 		
-		NOTHING	 						= "Rien",
+		NOTHING	 						= "-",
 		BANK_TO_INVENTORY				= "Vers l'Inventaire",
 		INVENTORY_TO_BANK				= "Vers la Banque",
 		MATCH_CRAFT						= "Match le craft correspondant",
@@ -132,7 +156,7 @@ language = {
 		CRAFTING_TYPE_PROVISIONING		= "Cuisine",
 		CRAFTING_TYPE_WOODWORKING		= "Travail du bois",
 		CRAFTING_TYPE_RAW				= "Matériaux bruts",
-		rawsWarning						= "Les Matériaux bruts ne bougeront pas si cette option est à Rien",
+		rawsWarning						= "Les Matériaux bruts ne bougeront pas si cette option est à -\n<<Match>> fait correspondre à chaque Materiau de base, la règle qui est appliquée à son type de craft",
 		ITEMTYPE_STYLE_MATERIAL			= "Matériaux de Styles",			
 		ITEMTYPE_WEAPON_TRAIT			= "Caractéristiques d'arme",			
 		ITEMTYPE_ARMOR_TRAIT			= "Caractéristiques d'armure",	
@@ -183,15 +207,28 @@ language = {
         
         spamChatText                    = "Chat Spam",
         spamChatTooltip                 = "Verschobene Objekte im Chat zeigen",
+		spamChatAllText					= "",
+		spamChatAllTextTooltip			= "",
 
 		autoTransfert 					= "Aktiviere den Auto-Transfer",
 		autoTransferttooltip			= "Aktiviert den Auto-Transfer von Gegenständen wenn die Bank geöffnet wird",
+
+		profilesNb						= "",
+		profilesNbTooltip				= "",
+		profile							= "",
+		defaultProfile					= "",
+		defaultProfileToolTip			= "",
+		profileName						= "",
+		profileNameTooltip				= "",
+
+		subMenuRulesButton				= "",
+		subMenuRulesButtonTooltip 		= "",
         
         AllBM                           = "Alle Objekte",
         fillStacks 						= "Stacks auffüllen",
 		fillStacksTooltip  				= "Unvollständige Stacks für Items ohne Optionen auffüllen",
         
-        NOTHING                         = "Nichts",
+        NOTHING                         = "-",
         BANK_TO_INVENTORY               = "In das Inventar holen",
         INVENTORY_TO_BANK               = "In die Bank schieben",
    		MATCH_CRAFT						= "Entsprechend des Berufs",
@@ -240,11 +277,20 @@ language = {
     }
 }
 
-
+-----------------------------------------------------------------------
+-- ** Function which will return the corresponding string translated **
+-- getTranslated(text)
+-- @text : String, The text ID in the localization array
+-----------------------------------------------------------------------
 function getTranslated(text)
     return language[BankManager.Saved["language"]][text]
 end
 
+------------------------------------------------------------
+-- ** Function that will detect the langage of the user **
+-- getBaseLanguage()
+-- Thanks to FTC for the discovery of this creative technic!
+------------------------------------------------------------
 function getBaseLanguage()
 	local errorString = GetErrorString(16)
 	if (errorString == "Ziel aus dem Gleichgewicht") then

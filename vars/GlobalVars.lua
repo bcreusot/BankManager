@@ -2,13 +2,19 @@
  -- Global Vars
 BankManagerVars    = "BMVars"
 BankManagerAppName = "BankManager"
-currentVersion     = "v2.6.3"
+currentVersion     = "v2.7"
 
 -- Main Vars
-BankManager = {}
+BankManager           = {}
 --Limit the number of message in the chat to avoid spamming detection by the game
-counterMessageChat = 0
-limitMessageChat   = 20
+counterMessageChat    = 0
+limitMessageChat      = 20
+--CUrrent selectec profile
+currentProfile         = 1
+--In case two quick click on the toolbar button while performing
+flagAlreadyPerforming = false
+--Number of Max Profiles per character
+maxProfilesNb          = 3
 
 languages = {
     "English",
@@ -16,7 +22,6 @@ languages = {
     "Deutsch"
 }
 
-flagAlreadyPerforming = false
 
 
 NOTHING             = "NOTHING"

@@ -1,45 +1,58 @@
+-----------------------
+-- TEXTURE LIST
+----------------------- 
+TEXTURE_PROFILE_BUTTON_1		  = "BankManager/img/Profile_1.dds"
+TEXTURE_PROFILE_BUTTON_PRESSED_1  = "BankManager/img/ProfilePressed_1.dds"
+
+TEXTURE_PROFILE_BUTTON_2		  = "BankManager/img/Profile_2.dds"
+TEXTURE_PROFILE_BUTTON_PRESSED_2  = "BankManager/img/ProfilePressed_2.dds"
+
+TEXTURE_PROFILE_BUTTON_3		  = "BankManager/img/Profile_3.dds"
+TEXTURE_PROFILE_BUTTON_PRESSED_3  = "BankManager/img/ProfilePressed_3.dds"
+
+FONT_TEXTURE 		  			  = "BankManager/img/font.dds"
 
 
-local TEXTURE_PUSH_BUTTON 		  	= "BankManager/img/push.dds"
-local TEXTURE_PUSH_BUTTON_PRESSED 	= "BankManager/img/pushPressed.dds"
+-----------------------
+-- BUTTON CODE
+-----------------------
 
-local TEXTURE_PULL_BUTTON 			= "BankManager/img/pull.dds"
-local TEXTURE_PULL_BUTTON_PRESSED   = "BankManager/img/pullPressed.dds"
 
-local FONT_TEXTURE 		  			= "BankManager/img/font.dds"
-
-local PUSH   = {
-	id      		= "_PUSH",
-	tooltip 		= "CLick to Push",
-	texture 		= TEXTURE_PUSH_BUTTON,
-	texturePressed  = TEXTURE_PUSH_BUTTON_PRESSED,
-	func    		= function ()
-			            local status,err = pcall(moveItems,true,false)
-			            if not status then
-			                cleanAll(err)
-			            end
-			        end
-}
-local PULL   = {
-	id      		= "_PULL",
-	tooltip 		= "CLick to Pull",
-	texture 		= TEXTURE_PULL_BUTTON,
-	texturePressed  = TEXTURE_PULL_BUTTON_PRESSED,
-	func    		= function ()
-			            local status,err = pcall(moveItems,false,true)
-			            if not status then
-			                cleanAll(err)
-			            end
-			        end
-}
-
+-----------------------
+-- TOOLBAR BUTTON LIST
+-----------------------
 local toolBarOptions ={
-	PULL,
-	PUSH
 }
 
-local startingOffsetXPosition = 10
-local iconSize = 50
+
+-----------------------
+-- UI VARS ONLY
+-----------------------
+local startingOffsetXPosition = 5
+local iconSize = 60
+
+--------------------------------------------------------------------
+-- ** Function which will dynamically create the profiles buttons **
+-- createProfilesButtons()
+--------------------------------------------------------------------
+local function createProfilesButtons()
+	for i=1,BankManager.Saved["profilesNb"] do
+		local profile   = {
+			id      		= "_PROFILE_"..i,
+			tooltip 		= getProfileName(i),
+			texture 		= _G["TEXTURE_PROFILE_BUTTON_"..i],
+			texturePressed  = _G["TEXTURE_PROFILE_BUTTON_PRESSED_"..i],
+			func    		= function ()
+					            local status,err = pcall(moveItems,true,true,i)
+					            if not status then
+					                cleanAll(err)
+					            end
+					        end
+		}
+		table.insert(toolBarOptions,profile)
+	end
+end
+
 
 ------------------------------------------------------------------------------------------------------
 -- ** Function which create one button in the toolbar **
@@ -61,7 +74,7 @@ local function AddButton(parentWindow,id,text,func,texturePath,texturePressed,of
 		--	TOOLTIP CONTROL
 	local tooltipControl
 	tooltipControl = WINDOW_MANAGER:CreateControl(id .. "_TOOLTIP",button,CT_TOOLTIP)
-	tooltipControl:SetOwner(button,TOPLEFT,-80,5,TOPLEFT)
+	tooltipControl:SetOwner(button,TOPLEFT,-string.len(text)*6,10,TOPLEFT)
 	tooltipControl:AddLine(text,"ZoFontBoss",255,255,255,CENTER,MODIFY_TEXT_TYPE_NONE,CENTER, true)
 	tooltipControl:SetHidden(true)
     
@@ -94,9 +107,11 @@ function InitializeGUI()
     texture:SetAnchorFill()
     texture:SetTexture(FONT_TEXTURE)
 
+    createProfilesButtons()
+
     for k,toolBarItem in pairs(toolBarOptions) do
     	local offset = k*startingOffsetXPosition + (k-1)*iconSize
-    	AddButton(BankManagerUIBG,BankManagerUIBG:GetName() .. toolBarItem.id,toolBarItem.tooltip, toolBarItem.func,toolBarItem.texture,toolBarItem.texturePressed,offset)
+    	AddButton(BankManagerUIBG,BankManagerUIBG:GetName() .. toolBarItem.id,toolBarItem.tooltip, toolBarItem.func,toolBarItem.texture,toolBarItem.texturePressed,offset,BankManager.Saved)
     end
 end
 

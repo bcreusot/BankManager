@@ -1,16 +1,5 @@
 
 
---------------------------------------------------------------------------------
---	***** Bank Manager *****
---	* Benjamin Creusot - Todo
---	* 17/04/2014 
---	* v2.6.3
---		Manage easily your bank. Automatically places items in your bank/inventory
---
---  * LICENSE MIT
---------------------------------------------------------------------------------
-
-
 ---------------------------------------------------------------------------------------
 -- ** Function that place one item in another bag/slot **
 -- placeItems(fromBag, fromSlot, destBag, destSlot, quantity)
@@ -43,8 +32,8 @@ end
 -- @return        : The state of the item, NOTHING, INVENTORY_TO_BANK,BANK_TO_INVENTORY
 ---------------------------------------------------------------------------------------
 local function getItemState(craftingType,itemType)
-    if BankManager.Saved.AllBM == INVENTORY_TO_BANK or BankManager.Saved.AllBM == BANK_TO_INVENTORY then
-        return BankManager.Saved.AllBM
+    if BankManager.Saved.AllBM[currentProfile] == INVENTORY_TO_BANK or BankManager.Saved.AllBM[currentProfile] == BANK_TO_INVENTORY then
+        return BankManager.Saved.AllBM[currentProfile]
     end
 
     if (itemType == ITEMTYPE_BLACKSMITHING_RAW_MATERIAL or 
@@ -55,70 +44,19 @@ local function getItemState(craftingType,itemType)
 
     --If the craft of itemtype is known and we got a entry for it (we treat it)
     if craftingType ~= CRAFTING_TYPE_INVALID and CRAFTING_TYPE_TRANSLATION[craftingType] then
-        if itemType == ITEMTYPE_RAW_MATERIAL and BankManager.Saved[ITEMTYPE_TRANSLATION[itemType]] ~= MATCH_CRAFT then
-            return BankManager.Saved[ITEMTYPE_TRANSLATION[itemType]]
+        if itemType == ITEMTYPE_RAW_MATERIAL and BankManager.Saved[ITEMTYPE_TRANSLATION[itemType]][currentProfile] ~= MATCH_CRAFT then
+            return BankManager.Saved[ITEMTYPE_TRANSLATION[itemType]][currentProfile]
         else
-            return BankManager.Saved[CRAFTING_TYPE_TRANSLATION[craftingType]]
+            return BankManager.Saved[CRAFTING_TYPE_TRANSLATION[craftingType]][currentProfile]
         end
     end
     if itemType ~= ITEMTYPE_NONE and ITEMTYPE_TRANSLATION[itemType] then
-        return BankManager.Saved[ITEMTYPE_TRANSLATION[itemType]]
+        return BankManager.Saved[ITEMTYPE_TRANSLATION[itemType]][currentProfile]
     end
     return NOTHING
 end
 
---------------------------------------------------------------------------------------
--- ** Function that transfor RGB table into HEX - Thanks to marceloCodget on Github **
--- rgbToHex(rgb)
--- @rgb     : Table,  table like {0.255, 0.100, 0.020}
--- @return  : String, String of the Hex value
-----------------------------------------------------------------------------------
-local function rgbToHex(rgb)
-    local hexadecimal = ''
-    for key, value in pairs(rgb) do
-        value = value * 255
-        local hex = ''
-        while(value > 0)do
-            local index = math.fmod(value, 16) + 1
-            value = math.floor(value / 16)
-            hex = string.sub('0123456789ABCDEF', index, index) .. hex           
-        end
-        if(string.len(hex) == 0)then
-            hex = '00'
-        elseif(string.len(hex) == 1)then
-            hex = '0' .. hex
-        end
-        hexadecimal = hexadecimal .. hex
-    end
-    return hexadecimal
-end
 
-----------------------------------------------------------------------------------
--- ** Function that display information in the chat about moving/stacking items **
--- displayChat(itemName, quantity, moved)
--- @itemName    : String,  Name of the item
--- @quantity    : Int,     Quantity of the item
--- @moved       : Boolean, If the item had been moved or stacked
--- @rgb         : Table,   Table of RGB colors
-----------------------------------------------------------------------------------
-function displayChat(itemName, quantity, moved, rgb)
-    if(counterMessageChat <= limitMessageChat) then
-        local startString,endString = string.find(itemName,"%^")
-        local ending                = ""
-        if startString ~= nil then
-            itemName = string.sub(itemName,0,startString-1)
-        end
-        if BankManager.Saved["spamChat"] then
-            if moved then
-                ending = getTranslated("itemsMoved")
-            else
-                ending = getTranslated("itemsStacked")
-            end
-            d("|c".. rgbToHex(rgb) .. "[".. itemName .. "]|r " .. "(x" .. quantity .. ") " .. ending)
-        end
-    end
-    counterMessageChat = counterMessageChat +1
-end
 
 --------------------------------------------------------------------------------------------------------------------
 -- ** Function that parse one bag then register information about free space, stackable items and push/pull items **
@@ -213,16 +151,17 @@ end
 
 ---------------------------------------------------------
 -- ** First Function in the moving part of the object **
--- moveItems(isPushSet,isPullSet)
--- @isPushSet : Boolean, define if we have to do the push
--- @isPullSet : Boolean, define if we have to do the pull
+-- moveItems(isPushSet,isPullSet,numProfile)
+-- @isPushSet  : Boolean, define if we have to do the push
+-- @isPullSet  : Boolean, define if we have to do the pull
+-- @numProfile : Int,     the profile which rules here
 ---------------------------------------------------------
-function moveItems(isPushSet,isPullSet)
+function moveItems(isPushSet,isPullSet,numProfile)
     -- check if the program is already performing
     assert(not flagAlreadyPerforming, getTranslated("alreadyPerforming"))
     --now it's performing :)
-    flagAlreadyPerforming = true
-
+    flagAlreadyPerforming  = true
+    currentProfile         = numProfile
     local nbItemsMove,nbItemsStack                      = 0,0
     local pushItems,pullItems                           = {},{}
     local bankBag                                       = BANKS_TRANSLATION[BankManager.Saved.bankChoice]
@@ -233,7 +172,6 @@ function moveItems(isPushSet,isPullSet)
     
     --BANK ANALYZE
     bankItemsStackTable,bankFreeSlots = getBagDescription(bankBag,pushItems,pullItems)
-
     --INVENTORY ANALYZE
     inventoryItemsStackTable, inventoryFreeSlots = getBagDescription(backpackBag,pushItems,pullItems)
 
@@ -249,19 +187,18 @@ function moveItems(isPushSet,isPullSet)
         --If the items is present in the dest
         if bankItemsStackTable[idItem] then
             local itemState   = itemInventory.state
-            local globalState = BankManager.Saved.AllBM
             local idPush      = inventoryItemsStackTable[idItem].idPushPull
             local idPull      = bankItemsStackTable[idItem].idPushPull
 
             --PUSH STACKING
-            if (isPushSet and (itemState == INVENTORY_TO_BANK or BankManager.Saved["fillStacks"] == INVENTORY_TO_BANK)) then
+            if (isPushSet and (itemState == INVENTORY_TO_BANK or BankManager.Saved["fillStacks"][currentProfile] == INVENTORY_TO_BANK)) then
                 -- The item has been completely stack ! We gotta remove it from the push table
                 if stackItems(idItem,inventoryItemsStackTable,bankItemsStackTable,inventoryFreeSlots) and itemState == INVENTORY_TO_BANK then
                     pushItems[idPush] = nil
                 end
                 nbItemsStack = nbItemsStack + 1
             --Same rule but for TO_INVENTORY
-            elseif (isPullSet and (itemState == BANK_TO_INVENTORY or BankManager.Saved["fillStacks"] == BANK_TO_INVENTORY)) then
+            elseif (isPullSet and (itemState == BANK_TO_INVENTORY or BankManager.Saved["fillStacks"][currentProfile] == BANK_TO_INVENTORY)) then
                 if stackItems(idItem,bankItemsStackTable,inventoryItemsStackTable,bankFreeSlots) and itemState == BANK_TO_INVENTORY then
                     pullItems[idPull] = nil
                 end
@@ -324,143 +261,15 @@ function moveItems(isPushSet,isPullSet)
         d((counterMessageChat - limitMessageChat) .. " " .. getTranslated("noDisplayed"))
     end
 
-    d("----------------------")
-    d(nbItemsMove .. " " .. getTranslated("itemsMoved"))
-    d(nbItemsStack .. " " .. getTranslated("itemsStacked"))
-    d("----------------------")
-
+    if BankManager.Saved["spamChatAll"] then
+        d("----------------------")
+        d(nbItemsMove .. " " .. getTranslated("itemsMoved"))
+        d(nbItemsStack .. " " .. getTranslated("itemsStacked"))
+        d("----------------------")
+    end
     --Data reset for new action
     counterMessageChat    = 0
     flagAlreadyPerforming = false
 end
 
 
----------------------------------------------------------------------------
--- ** Function called when the events are raised **
--- bankOpening(eventCode, addOnName, isManual)
--- @eventCode : Int,     Code of the event
--- @addOnName : String,  Name of the addon
--- @isManual  : Boolean, If the function was not launch by us... I guess :)
----------------------------------------------------------------------------
-function bankOpening(eventCode, addOnName, isManual)
-    if isManual then
-        return
-    end
-
-    --Display the toolbar
-    if BankManager.Saved.toolBarDisplayed then
-        showUI()
-    end
-
-    -- if the automatique push/pull is disable
-    if not BankManager.Saved.autoTransfert then
-        return
-    end
-
-    if BankManager.Saved.bankChoice == "BAG_BANK" and eventCode == EVENT_OPEN_BANK then
-        ClearCursor()
-        local status,err = pcall(moveItems,true,true)
-        if not status then
-            cleanAll(err)
-        end
-    elseif BankManager.Saved.bankChoice == "BAG_GUILDBANK" and eventCode == EVENT_GUILD_BANK_ITEMS_READY  and BankManager.Saved["guildChoice"] then
-        --We set the guild bank to work with
-        --we check the permission
-        if DoesPlayerHaveGuildPermission(BankManager.Saved["guildChoice"], GUILD_PERMISSION_BANK_DEPOSIT) and DoesPlayerHaveGuildPermission(BankManager.Saved["guildChoice"], GUILD_PERMISSION_BANK_WITHDRAW) then 
-            SelectGuildBank(BankManager.Saved["guildChoice"])
-            ClearCursor()
-            local status,err = pcall(moveItems,true,true)
-            if not status then
-                cleanAll(err)
-            end
-        else
-            d(getTranslated("noPermission"))
-        end
-    end
-
-end
-
-------------------------------------------------
--- ** Function called when the bank is closed **
--- bankClose()
-------------------------------------------------
-function bankClose()
-    hideUI()
-end
----------------------------------------------------------------------------
--- ** Function called when an error is catch on the main loop, moveItems **
--- cleanAll(err)
--- @err the error catch
----------------------------------------------------------------------------
-function cleanAll(err)
-    counterMessageChat    = 0
-    flagAlreadyPerforming = false
-    --I have to print the error with the INGame system for a better communication between users and me
-    assert(false,err)
-end
-
-------------------------------------------
--- ** Init Function **
--- init(eventCode, addOnName)
--- @eventCode : Int,     Code of the event
--- @addOnName : String,  Name of the addon
-------------------------------------------
-function init(eventCode, addOnName)
-    if addOnName ~= BankManagerAppName then
-        return
-    end
-
-    local initVarFalse              = NOTHING
-    local defaults = {
-        ["language"]                = getBaseLanguage(),
-        ["toolBarDisplayed"]        = true,
-        ["bankChoice"]              = "BAG_BANK",
-        ["guildChoice"]             = GetGuildId(1),
-        ["autoTransfert"]           = true,
-        ["spamChat"]                = false,
-        ["AllBM"]                   = NOTHING,
-        ["fillStacks"]              = NOTHING
-    }
-    
-    for k,v in ipairs(craftingElements) do
-        defaults[v] = initVarFalse
-    end
-    for k,v in ipairs(othersElements) do
-        defaults[v] = initVarFalse
-    end
-    BankManager.Saved = ZO_SavedVars:New(BankManagerVars, 1, nil, defaults, nil)
-    
-    --New vars until changing version saved number
-    if not BankManager.Saved.fillStacks then
-        BankManager.Saved.fillStacks = NOTHING
-    end
-    if not BankManager.Saved.ITEMTYPE_LURE then
-        BankManager.Saved.ITEMTYPE_LURE = NOTHING
-    end
-    if not BankManager.Saved.bankChoice then
-        BankManager.Saved.bankChoice = "BAG_BANK"
-    end
-    if not BankManager.Saved.guildChoice then
-        BankManager.Saved.guildChoice = GetGuildId(1)
-    end
-    if BankManager.Saved.autoTransfert == nil then
-        BankManager.Saved.autoTransfert = true
-    end
-    if BankManager.Saved.toolBarDisplayed == nil then
-        BankManager.Saved.toolBarDisplayed = true
-    end
-
-
-
-    options()
-    InitializeGUI()
-
-
-    EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_OPEN_BANK              , bankOpening)
-    EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_CLOSE_BANK             , bankClose)
-    --EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_GUILD_BANK_ITEMS_READY, bankOpening)
-
-end
-
-
-EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_ADD_ON_LOADED, init)
