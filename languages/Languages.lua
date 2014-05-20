@@ -122,7 +122,7 @@ language = {
 		autoTransferttooltip			= "Activer le transfert automatique d'objets quand la banque s'ouvre",
 
 		profilesNb						= "Nombre de profils",
-		profilesNbTooltip				= "Nombre maximum de profils definissables",
+		profilesNbTooltip				= "Nombre maximum de profils définissables",
 		profile							= "Profil",
 		defaultProfile					= "Profil par défaut",
 		defaultProfileToolTip			= "Profil par défaut à l'ouverture de la banque si le Transfert Auto est activé",
