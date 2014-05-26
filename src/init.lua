@@ -6,7 +6,7 @@
 --
 --  * Benjamin Creusot - Todo
 --  * Creation : 17/04/2014 
---  * v2.7
+--  * v2.8
 --      Manage easily your bank. Automatically places items in your bank/inventory
 --
 --  * LICENSE MIT
@@ -79,6 +79,21 @@ function cleanAll(err)
 end
 
 
+------------------------------------------------------------------------------------
+-- ** Function called when the options panel is close (EVENT_ACTION_LAYER_POPPED) **
+-- dirtyAndReloadUI(eventCode, layerIndex, activeLayerIndex)
+-- @eventCode        : Int, Code of the event
+-- @layerIndex       : Int, Int of the last last layer pushed
+-- @activeLayerIndex : Int, Current layer I guess
+------------------------------------------
+function dirtyAndReloadUI(eventCode, layerIndex, activeLayerIndex)
+    --15 are the options panel and 2 don't remember :D
+    if layerIndex == 15 and activeLayerIndex == 2 and dirty then
+        dirty = false
+        ReloadUI()
+    end
+end
+
 ------------------------------------------
 -- ** Init Function **
 -- init(eventCode, addOnName)
@@ -103,30 +118,35 @@ function init(eventCode, addOnName)
         ["profilesNames"]           = {},
         ["defaultProfile"]          = 1,
         ["AllBM"]                   = {},
-        ["fillStacks"]              = {}
+        ["fillStacks"]              = {},
+        ["stackSizeCheckBox"]       = {},
+        ["stackSizeSlider"]         = {}
     }
     
     for i=1,maxProfilesNb do
         defaults["AllBM"][i]      = NOTHING
         defaults["fillStacks"][i] = NOTHING
-        for k,v in ipairs(craftingElements) do
-            if defaults[v] == nil then
-                 defaults[v] = {}
+        defaults["stackSizeCheckBox"][i] = false
+        defaults["stackSizeSlider"][i] = 100
+        for key,arrayRules in ipairs(allRules) do
+            for keyRule,rule in ipairs(arrayRules) do
+                if defaults[rule] == nil then
+                     defaults[rule] = {}
+                end
+                defaults[rule][i] = initVarFalse
             end
-            defaults[v][i] = initVarFalse
-        end
-        for k,v in ipairs(othersElements) do
-            if defaults[v] == nil then
-                 defaults[v] = {}
-            end
-            defaults[v][i] = initVarFalse
         end
     end
-    BankManager.Saved = ZO_SavedVars:New(BankManagerVars, 2, nil, defaults, nil)
-    
-    options()
+    BankManager.Saved = ZO_SavedVars:New(BankManagerVars, 3, nil, defaults, nil)
+
+    --Later call of the option function to remove the anchor issue
+    zo_callLater(function() options() end, 500)
     InitializeGUI()
 
+
+    EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_ACTION_LAYER_POPPED     , dirtyAndReloadUI)
+
+    --ZO_PreHook("ZO_OptionsWindow_ChangePanels", function(panel) end)
 
     EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_OPEN_BANK              , bankOpening)
     EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_CLOSE_BANK             , bankClose)

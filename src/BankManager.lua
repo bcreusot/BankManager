@@ -27,33 +27,40 @@ end
 ---------------------------------------------------------------------------------------
 -- ** Function return the state of an item regarding of the option sets **
 -- getItemState(craftingType,itemType)
--- @craftingType  : Int,  Type of craft, describe in the API of ESO
 -- @itemType      : Int,  Type of item,  describe in the API of ESO
+-- @stackSize     : Int,  Size of the item stack
 -- @return        : The state of the item, NOTHING, INVENTORY_TO_BANK,BANK_TO_INVENTORY
 ---------------------------------------------------------------------------------------
-local function getItemState(craftingType,itemType)
+local function getItemState(itemType,stackSize)
+    --Test if their is a limit on the stack size
+    if BankManager.Saved["stackSizeCheckBox"][currentProfile] and BankManager.Saved["stackSizeSlider"][currentProfile] ~= stackSize then
+        return NOTHING
+    end
+
+    --Test of the global setting for the profil
     if BankManager.Saved.AllBM[currentProfile] == INVENTORY_TO_BANK or BankManager.Saved.AllBM[currentProfile] == BANK_TO_INVENTORY then
         return BankManager.Saved.AllBM[currentProfile]
     end
 
-    if (itemType == ITEMTYPE_BLACKSMITHING_RAW_MATERIAL or 
-           itemType == ITEMTYPE_CLOTHIER_RAW_MATERIAL or
-           itemType == ITEMTYPE_WOODWORKING_RAW_MATERIAL) then
-        itemType = ITEMTYPE_RAW_MATERIAL
-    end
-
-    --If the craft of itemtype is known and we got a entry for it (we treat it)
-    if craftingType ~= CRAFTING_TYPE_INVALID and CRAFTING_TYPE_TRANSLATION[craftingType] then
-        if itemType == ITEMTYPE_RAW_MATERIAL and BankManager.Saved[ITEMTYPE_TRANSLATION[itemType]][currentProfile] ~= MATCH_CRAFT then
-            return BankManager.Saved[ITEMTYPE_TRANSLATION[itemType]][currentProfile]
-        else
-            return BankManager.Saved[CRAFTING_TYPE_TRANSLATION[craftingType]][currentProfile]
-        end
-    end
     if itemType ~= ITEMTYPE_NONE and ITEMTYPE_TRANSLATION[itemType] then
         return BankManager.Saved[ITEMTYPE_TRANSLATION[itemType]][currentProfile]
     end
     return NOTHING
+
+--    if (itemType == ITEMTYPE_BLACKSMITHING_RAW_MATERIAL or 
+--           itemType == ITEMTYPE_CLOTHIER_RAW_MATERIAL or
+--           itemType == ITEMTYPE_WOODWORKING_RAW_MATERIAL) then
+--        itemType = ITEMTYPE_RAW_MATERIAL
+--    end
+--
+--    --If the craft of itemtype is known and we got a entry for it (we treat it)
+--    if craftingType ~= CRAFTING_TYPE_INVALID and CRAFTING_TYPE_TRANSLATION[craftingType] then
+--        if itemType == ITEMTYPE_RAW_MATERIAL and BankManager.Saved[ITEMTYPE_TRANSLATION[itemType]][currentProfile] ~= MATCH_CRAFT then
+--            return BankManager.Saved[ITEMTYPE_TRANSLATION[itemType]][currentProfile]
+--        else
+--            return BankManager.Saved[CRAFTING_TYPE_TRANSLATION[craftingType]][currentProfile]
+--        end
+--    end
 end
 
 
@@ -84,8 +91,7 @@ local function getBagDescription(bag,pushItems,pullItems)
             item.name                  = GetItemName(bag, slotDest)
             item.stack,item.maxStack   = GetSlotStackSize(bag, slotDest)
             item.itemType              = GetItemType(bag, slotDest)
-            item.craftType             = GetItemCraftingInfo(bag, slotDest)
-            item.state                 = getItemState(item.craftType,item.itemType)
+            item.state                 = getItemState(item.itemType,item.stack)
             item.quality               = itemQuality
         end
         --if the item is not from the junk, and if the items got room for more

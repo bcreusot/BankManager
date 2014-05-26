@@ -1,19 +1,27 @@
 ## Title: Bank Manager - By |c3366FF@Todo|r - 2.7
-## APIVersion: 100003
-## Version: 2.7
+## APIVersion: 100004
+## Version: 2.8
 ## Author: Todo
 ## Description: Manage easily your bank! 
 ## SavedVariables: BMVars
 
 Libs/LibStub/LibStub.lua
-Libs/LibAddonMenu-1.0(BankManager)/LibAddonMenu-1.0(BankManager).lua
+Libs/LibAddonMenu-1.0/LibAddonMenu-1.0.lua
 
 vars/GlobalVars.lua
+vars/RulesVars.lua
+
 Languages/Languages.lua
+Languages/English.lua
+Languages/Francais.lua
+Languages/Deutsh.lua
+
+
 UI/BankManagerOpts.lua
 UI/BankManager.xml
 UI/BankManagerUI.lua
+
 src/util.lua
-## GuildBankManager.lua
+## src/GuildBankManager.lua
 src/BankManager.lua
 src/init.lua

@@ -1,15 +1,17 @@
 
 
-local function setlanguage(val,controleKey)
+function setReloadMessage()
+    reloadUITextbox.desc:SetText("|cFF0000"..getTranslated("reloadWarning").."|r")
+end
+
+local function setlanguage(val)
     BankManager.Saved["language"] = val
-    ReloadUI()
+    dirty = true
+    setReloadMessage()
 end
 
 --Browse the language to find the key back
-local function changeTranslateTable(val,key)
-    profileNum = tonumber(string.match(key, "#(%d+)"))
-    key       = string.gsub(key, "#.", "")
-
+local function changeTranslateTable(val,key,profileNum)
     for keyTrad,tradValue in pairs(language[BankManager.Saved["language"]]) do
         if tradValue == val then
             if profileNum ~= nil then
@@ -20,7 +22,6 @@ local function changeTranslateTable(val,key)
             return
         end
     end
-
 end
 
 
@@ -42,7 +43,7 @@ local function getGuildList()
     return guildList
 end
 
-local function setGuild(val,key)
+local function setGuild(val)
     local nbGuild = GetNumGuilds()
 
     for i=1,nbGuild do
@@ -62,9 +63,10 @@ local function getMaxProfilesNb()
     return profileNbList
 end
 
-local function setProfilesNb(val,key)
+local function setProfilesNb(val)
     BankManager.Saved["profilesNb"] = val
-    ReloadUI()
+    dirty = true
+    setReloadMessage()
 end
 
 
@@ -84,7 +86,7 @@ local function getProfilesNames()
     return profilesNames
 end
 
-local function setDefaultProfile(val,key)
+local function setDefaultProfile(val)
     for k,v in pairs(getProfilesNames()) do
         if v == val then
             BankManager.Saved["defaultProfile"] = k
@@ -93,44 +95,132 @@ local function setDefaultProfile(val,key)
     end
 end
 
-local function createSubMenuRules(lam,panelID,numProfile)
-    --CRAFT MODE
-    lam:AddHeader(panelID, "craftHeaderBM"..numProfile,  "|c3366FF" .. getTranslated("craftHeader").."|r")
-    for key,craftKey in pairs(craftingElements) do
-        local craftName = getTranslated(craftKey)
-        --special treatment if this is Raw Material
-        if craftKey == "CRAFTING_TYPE_RAW" then
-            --The checkbox -- #is for the conflict    
-            lam:AddDropdown(panelID, craftKey.."#"..numProfile, "|cFFA200"..craftName.."|r", "", getTranslateTable(rawSendingType),
-            function() return getTranslated(BankManager.Saved[craftKey][numProfile]) end,
-            changeTranslateTable,true,getTranslated("rawsWarning")) 
-        else
-            lam:AddDropdown(panelID, craftKey.."#"..numProfile, craftName, "", getTranslateTable(sendingType),
-            function() return getTranslated(BankManager.Saved[craftKey][numProfile]) end,
-            changeTranslateTable) 
-        end
+local function setAllOptions(val,numProfile,arrayElements)
+    for key,element in pairs(arrayElements) do
+        dropmenu = ZO_ComboBox_ObjectFromContainer(GetControl(element.."#"..numProfile, "Dropdown"))
+        dropmenu:SetSelectedItem(val)
+        changeTranslateTable(val,element,numProfile)
     end
-
-    --OTHERS MODE
-    lam:AddHeader(panelID, "othersHeaderBM"..numProfile, "|c3366FF" .. getTranslated("othersHeader").."|r")
-    for key,othersKey in pairs(othersElements) do
-        local othersName = getTranslated(othersKey)
+end
 
 
-        --The checkbox -- #is for the conflict 
-        lam:AddDropdown(panelID, othersKey.."#"..numProfile, othersName, "", getTranslateTable(sendingType),
-            function() return getTranslated(BankManager.Saved[othersKey][numProfile]) end,
-            changeTranslateTable)    
+local function createSubMenuStacksRules(lam,panelID,numProfile)
+    lam:AddDropdown(panelID, "fillStacks#"..numProfile, getTranslated("fillStacks"), getTranslated("fillStacksTooltip"), getTranslateTable(sendingType),
+        function() return getTranslated(BankManager.Saved["fillStacks"][numProfile]) end,
+        function(val) changeTranslateTable(val,"fillStacks",numProfile) end)
+
+    lam:AddCheckbox(panelID, "transferBasedStackSize#"..numProfile,getTranslated("stackSizeCheckBox"),getTranslated("stackSizeCheckBoxTooltip"),
+        function() return BankManager.Saved["stackSizeCheckBox"][numProfile] end,
+        function(val) BankManager.Saved["stackSizeCheckBox"][numProfile] = val end)
+
+    lam:AddSlider(panelID, "sliderStackSizeBM#"..numProfile, getTranslated("stackSizeSlider"), getTranslated("stackSizeSliderTooltip"), 1, 100, 1,
+        function() return BankManager.Saved["stackSizeSlider"][numProfile] end,
+        function(val) BankManager.Saved["stackSizeSlider"][numProfile] = val end)
+end
+
+
+local function createSubMenuBlackSmithingRules(lam,panelID,numProfile)
+    lam:AddHeader(panelID, "blackSmithingHeaderBM#"..numProfile,  "|c3366FF" .. getTranslated("CRAFTING_TYPE_BLACKSMITHING").."|r")
+    lam:AddDropdown(panelID, "setAllOptionsBlackSmithing#"..numProfile, "|cFFA200" .. getTranslated("setAllOptions") .."|r", getTranslated("setAllOptionsTooltip"), getTranslateTable(sendingType),
+            function() return "-" end,
+            function(val) setAllOptions(val,numProfile,blackSmithingRules) end)
+
+    for k,craftKey in pairs(blackSmithingRules) do
+        lam:AddDropdown(panelID, craftKey.."#"..numProfile, getTranslated(craftKey), "", getTranslateTable(sendingType),
+        function() return getTranslated(BankManager.Saved[craftKey][numProfile]) end,
+        function(val) changeTranslateTable(val,craftKey,numProfile) end)
+    end
+end
+
+local function createSubMenuClothierRules(lam,panelID,numProfile)
+    lam:AddHeader(panelID, "clothierHeaderBM#"..numProfile,  "|c3366FF" .. getTranslated("CRAFTING_TYPE_CLOTHIER").."|r")
+    lam:AddDropdown(panelID, "setAllOptionsClothier#"..numProfile, "|cFFA200" .. getTranslated("setAllOptions") .."|r", getTranslated("setAllOptionsTooltip"), getTranslateTable(sendingType),
+            function() return "-" end,
+            function(val) setAllOptions(val,numProfile,clothierRules) end)
+
+    for k,craftKey in pairs(clothierRules) do
+        lam:AddDropdown(panelID, craftKey.."#"..numProfile, getTranslated(craftKey), "", getTranslateTable(sendingType),
+        function() return getTranslated(BankManager.Saved[craftKey][numProfile]) end,
+        function(val) changeTranslateTable(val,craftKey,numProfile) end)
+    end
+end
+
+local function createSubMenuWoodWorkingRules(lam,panelID,numProfile)
+    lam:AddHeader(panelID, "woodworkingHeaderBM#"..numProfile,  "|c3366FF" .. getTranslated("CRAFTING_TYPE_WOODWORKING").."|r")
+    lam:AddDropdown(panelID, "setAllOptionsWoodWorking#"..numProfile, "|cFFA200" .. getTranslated("setAllOptions") .."|r", getTranslated("setAllOptionsTooltip"), getTranslateTable(sendingType),
+            function() return "-" end,
+            function(val) setAllOptions(val,numProfile,woodWorkingRules) end)
+
+    for k,craftKey in pairs(woodWorkingRules) do
+        lam:AddDropdown(panelID, craftKey.."#"..numProfile, getTranslated(craftKey), "", getTranslateTable(sendingType),
+        function() return getTranslated(BankManager.Saved[craftKey][numProfile]) end,
+        function(val) changeTranslateTable(val,craftKey,numProfile) end)
+    end
+end
+
+local function createSubMenuProvisioningRules(lam,panelID,numProfile)
+    lam:AddHeader(panelID, "provisioningHeaderBM#"..numProfile,  "|c3366FF" .. getTranslated("CRAFTING_TYPE_PROVISIONING").."|r")
+    lam:AddDropdown(panelID, "setAllOptionsProvisioning#"..numProfile, "|cFFA200" .. getTranslated("setAllOptions") .."|r", getTranslated("setAllOptionsTooltip"), getTranslateTable(sendingType),
+            function() return "-" end,
+            function(val) setAllOptions(val,numProfile,provisioningRules) end)
+
+    for k,craftKey in pairs(provisioningRules) do
+        lam:AddDropdown(panelID, craftKey.."#"..numProfile, getTranslated(craftKey), "", getTranslateTable(sendingType),
+        function() return getTranslated(BankManager.Saved[craftKey][numProfile]) end,
+        function(val) changeTranslateTable(val,craftKey,numProfile) end)
+    end
+end
+
+local function createSubMenuEnchantingRules(lam,panelID,numProfile)
+    lam:AddHeader(panelID, "enchantingHeaderBM#"..numProfile,  "|c3366FF" .. getTranslated("CRAFTING_TYPE_ENCHANTING").."|r")
+    lam:AddDropdown(panelID, "setAllOptionsEnchanting#"..numProfile, "|cFFA200" .. getTranslated("setAllOptions") .."|r", getTranslated("setAllOptionsTooltip"), getTranslateTable(sendingType),
+            function() return "-" end,
+            function(val) setAllOptions(val,numProfile,enchantingRules) end)
+
+    for k,craftKey in pairs(enchantingRules) do
+        lam:AddDropdown(panelID, craftKey.."#"..numProfile, getTranslated(craftKey), "", getTranslateTable(sendingType),
+        function() return getTranslated(BankManager.Saved[craftKey][numProfile]) end,
+        function(val) changeTranslateTable(val,craftKey,numProfile) end)
+    end
+end
+
+local function createSubMenuAlchemyRules(lam,panelID,numProfile)
+    lam:AddHeader(panelID, "alchemyHeaderBM#"..numProfile,  "|c3366FF" .. getTranslated("CRAFTING_TYPE_ALCHEMY").."|r")
+    lam:AddDropdown(panelID, "setAllOptionsAlchemy#"..numProfile, "|cFFA200" .. getTranslated("setAllOptions") .."|r", getTranslated("setAllOptionsTooltip"), getTranslateTable(sendingType),
+            function() return "-" end,
+            function(val) setAllOptions(val,numProfile,alchemyRules) end)
+
+    for k,craftKey in pairs(alchemyRules) do
+        lam:AddDropdown(panelID, craftKey.."#"..numProfile, getTranslated(craftKey), "", getTranslateTable(sendingType),
+        function() return getTranslated(BankManager.Saved[craftKey][numProfile]) end,
+        function(val) changeTranslateTable(val,craftKey,numProfile) end)
+    end
+end
+
+
+local function createSubMenuOthersItemsRules(lam,panelID,numProfile)
+    --CRAFT MODE
+    lam:AddHeader(panelID, "othersHeaderBM#"..numProfile,  "|c3366FF" .. getTranslated("othersHeader").."|r")
+    lam:AddDropdown(panelID, "setAllOptionsOthers#"..numProfile, "|cFFA200" .. getTranslated("setAllOptions") .."|r", getTranslated("setAllOptionsTooltip"), getTranslateTable(sendingType),
+            function() return "-" end,
+            function(val) setAllOptions(val,numProfile,othersElementsRules) end)
+
+    for k,othersKey in pairs(othersElementsRules) do
+        lam:AddDropdown(panelID, othersKey.."#"..numProfile, getTranslated(othersKey), "", getTranslateTable(sendingType),
+        function() return getTranslated(BankManager.Saved[othersKey][numProfile]) end,
+        function(val) changeTranslateTable(val,othersKey,numProfile) end)
     end
 end
 
 function options()
     local textCheckBox = ""
     local craftName, textCheckBox, othersKey
-    local LAM = LibStub("BankManager_LibAddonMenu-1.0")
-    local optionsPanel = LAM:CreateControlPanel("Bank Manager", "|c3366FFBank|r Manager")
+    local LAM = LibStub("LibAddonMenu-1.0")
+    optionsPanel = LAM:CreateControlPanel("Bank Manager", "|c3366FFBank|r Manager")
     LAM:AddHeader(optionsPanel, "versionBM", "|c3366FF" .. getTranslated("version").."|r:" .. currentVersion)
     LAM:AddHeader(optionsPanel, "headerBM", "|c3366FF" .. getTranslated("title").."|r" )
+
+    reloadUITextbox = LAM:AddDescription(optionsPanel, "ReloadRequiredBM", "")
 
     LAM:AddDropdown(optionsPanel, "languageBM", getTranslated("dropDownLanguageText"), getTranslated("dropDownLanguageTooltip"), languages,
             function() return BankManager.Saved["language"] end,
@@ -143,7 +233,8 @@ function options()
     
     LAM:AddDropdown(optionsPanel, "bankChoice", "|cFF0000" .. getTranslated("bankChoice").."|r", getTranslated("bankChoiceTooltip"), getTranslateTable(banks),
             function() return getTranslated(BankManager.Saved["bankChoice"]) end,
-            changeTranslateTable,true,"NOT WORKING")
+            function(val) changeTranslateTable(val,"bankChoice") end,
+            true,"NOT WORKING")
 
     LAM:AddDropdown(optionsPanel, "guildChoice", getTranslated("guildChoice"), getTranslated("guildChoice"), getGuildList(),
             function() return GetGuildName(BankManager.Saved["guildChoice"]) end,
@@ -175,24 +266,69 @@ function options()
 
     --Profile Mode !
     for i=1,BankManager.Saved["profilesNb"] do
-        LAM:AddHeader(optionsPanel, "headerProfiles"..i.."BM", "|c3366FF"..getProfileName(i).."|r")
-        LAM:AddEditBox(optionsPanel, "editBoxProfiles"..i.."BM", getTranslated("profileName"), getTranslated("profileNameTooltip"), false,
+        LAM:AddHeader(optionsPanel, "headerProfilesBM#"..i, "|c3366FF"..getProfileName(i).."|r")
+        LAM:AddEditBox(optionsPanel, "editBoxProfilesBM#"..i, getTranslated("profileName"), getTranslated("profileNameTooltip"), false,
             function() return getProfileName(i) end,
-            function(val) 
-                BankManager.Saved["profilesNames"][i] = val
-                ReloadUI()
+            function(val)
+                if val ~= BankManager.Saved["profilesNames"][i] then
+                    BankManager.Saved["profilesNames"][i] = val
+                    dirty = true
+                    setReloadMessage()
+                end
             end,
             true , getTranslated("reloadWarning"))
 
         LAM:AddDropdown(optionsPanel, "AllBM#"..i, getTranslated("AllBM"), "", getTranslateTable(sendingType),
             function() return getTranslated(BankManager.Saved["AllBM"][i]) end,
-            changeTranslateTable)
+            function(val) changeTranslateTable(val,"AllBM",i) end)
 
-        LAM:AddDropdown(optionsPanel, "fillStacks#"..i, getTranslated("fillStacks"), getTranslated("fillStacksTooltip"), getTranslateTable(sendingType),
-            function() return getTranslated(BankManager.Saved["fillStacks"][i]) end,
-            changeTranslateTable)
+        ----------------------------------------------------------
+        ---------------------- STACK BUTTON ----------------------
+        ----------------------------------------------------------
+        local subMenuStacksRules = LAM:AddSubMenu(optionsPanel, "subMenuStacksRulesBM#"..i, getTranslated("subMenuStacksRules"), getTranslated("subMenuStacksRulesTooltip"))
+        createSubMenuStacksRules(LAM, subMenuStacksRules,i)
 
-        local subMenuRules = LAM:AddSubMenu(optionsPanel, "subMenuRulesBM"..i, getTranslated("subMenuRulesButton"), getTranslated("subMenuRulesButtonTooltip"))
-        createSubMenuRules(LAM, subMenuRules,i)
+        ----------------------------------------------------------
+        ---------------------- SMITHING BUTTON -------------------
+        ----------------------------------------------------------
+        subMenuBlackSmithingRules = LAM:AddSubMenu(optionsPanel, "subMenuBlackSmithingRulesBM"..i, getTranslated("CRAFTING_TYPE_BLACKSMITHING"), "")
+        createSubMenuBlackSmithingRules(LAM, subMenuBlackSmithingRules,i)
+
+        ----------------------------------------------------------
+        ---------------------- CLOTHIER BUTTON -------------------
+        ----------------------------------------------------------
+        local subMenuClothierRules = LAM:AddSubMenu(optionsPanel, "subMenuClothierRulesBM#"..i, getTranslated("CRAFTING_TYPE_CLOTHIER"), "")
+        createSubMenuClothierRules(LAM, subMenuClothierRules,i)
+
+        ----------------------------------------------------------
+        -------------------- WOODWORKING BUTTON ------------------
+        ----------------------------------------------------------
+        local subMenuWoodWorkingRules = LAM:AddSubMenu(optionsPanel, "subMenuWoodWorkingRulesBM#"..i, getTranslated("CRAFTING_TYPE_WOODWORKING"), "")
+        createSubMenuWoodWorkingRules(LAM, subMenuWoodWorkingRules,i)
+
+        ----------------------------------------------------------
+        -------------------- PROVISIONING BUTTON -----------------
+        ----------------------------------------------------------
+        local subMenuProvisioningRules = LAM:AddSubMenu(optionsPanel, "subMenuProvisioningRulesBM#"..i, getTranslated("CRAFTING_TYPE_PROVISIONING"), "")
+        createSubMenuProvisioningRules(LAM, subMenuProvisioningRules,i)
+
+        ----------------------------------------------------------
+        ---------------------- ENCHANTING BUTTON -----------------
+        ----------------------------------------------------------
+        local subMenuEnchantingRules = LAM:AddSubMenu(optionsPanel, "subMenuEnchantingRulesBM#"..i, getTranslated("CRAFTING_TYPE_ENCHANTING"), "")
+        createSubMenuEnchantingRules(LAM, subMenuEnchantingRules,i)
+
+        ----------------------------------------------------------
+        ---------------------- ALCHEMY BUTTON --------------------
+        ----------------------------------------------------------
+        local subMenuAlchemyRules = LAM:AddSubMenu(optionsPanel, "subMenuAlchemyRulesBM#"..i, getTranslated("CRAFTING_TYPE_ALCHEMY"), "")
+        createSubMenuAlchemyRules(LAM, subMenuAlchemyRules,i)
+
+        ----------------------------------------------------------
+        ---------------------- ALCHEMY BUTTON --------------------
+        ----------------------------------------------------------
+        local subMenuOthersItemsRules = LAM:AddSubMenu(optionsPanel, "subMenuOthersItemsRulesBM#"..i, getTranslated("othersHeader"), "")
+        createSubMenuOthersItemsRules(LAM, subMenuOthersItemsRules,i)
+
     end
 end

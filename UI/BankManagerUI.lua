@@ -47,6 +47,9 @@ local function createProfilesButtons()
 					            if not status then
 					                cleanAll(err)
 					            end
+					            d(subMenuBlackSmithingRulesBM1:IsHidden())
+					            subMenuBlackSmithingRulesBM1:SetHidden(true)
+					            d(subMenuBlackSmithingRulesBM1:IsHidden())
 					        end
 		}
 		table.insert(toolBarOptions,profile)
