@@ -21,6 +21,11 @@ optionsPanel          = nil
 dirty                 = false
 --The controle panel textbox to display if the UI has to reload
 reloadUITextbox       = nil
+--type of gold transfer
+typeOfGoldTransfer = {
+	"goldAmount","goldPercentage"
+}
+
 --test var
 test = {}
 

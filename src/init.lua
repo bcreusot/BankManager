@@ -120,7 +120,14 @@ function init(eventCode, addOnName)
         ["AllBM"]                   = {},
         ["fillStacks"]              = {},
         ["stackSizeCheckBox"]       = {},
-        ["stackSizeSlider"]         = {}
+        ["stackSizeSlider"]         = {},
+        ["autoGoldTransfer"]        = false,
+        ["typeOfGoldTransfer"]      = typeOfGoldTransfer, 
+        ["amountGoldTransferInt"]   = 1000,
+        ["amountGoldTransferPerc"]  = 10,
+        ["timeBetweenGoldTransfer"] = 10,
+        ["minGoldKeep"]             = 1000
+
     }
     
     for i=1,maxProfilesNb do
