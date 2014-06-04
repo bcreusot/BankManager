@@ -32,7 +32,30 @@ language.Deutsch = {
 	profile  						      = "Profil",
 	defaultProfile  				      = "Standard-Profil",
 	defaultProfileToolTip  			      = "Standard-Profil beim Öffnen der Bank wenn Auto-Transfer aktiviert ist",
-	profileName  					      = "Profil-Name",
+	
+    goldHeader                            = "",
+    autoGoldTransfer                      = "",
+    autoGoldTransferTooltip               = "",
+    goldButtonToolbar                     = "",
+    subMenuGoldRules                      = "",
+    directionGoldTransfer                 = "",
+    typeOfGoldTransfer                    = "",
+    goldAmount                            = "",
+    goldPercentage                        = "",
+    amountGoldTransferInt                 = "",
+    amountGoldTransferIntTooltip          = "",
+    amountGoldTransferPerc                = "",
+    amountGoldTransferPercTooltip         = "",
+    minGoldKeep                           = "",
+    minGoldKeepTooltip                    = "",
+    timeBetweenGoldTransfer               = "",
+    timeBetweenGoldTransferTooltip        = "",
+    goldMoved                             = "",
+    goldTimeNotReach                      = "",
+    notEnoughGold                         = "",
+
+    
+    profileName  					      = "Profil-Name",
 	profileNameTooltip  			      = "Name des Profils eingeben",
 
     AllBM                                 = "Alle Objekte",
@@ -58,6 +81,8 @@ language.Deutsch = {
     noDisplayed						      = "meldungen nicht angezeigt",
     itemsMoved                            = "Objekt(e) verschoben",
     itemsStacked                          = "Objekt(e) gestapelt",
+    itemsNotMovedInv                      = "Objekt(e) |cFF0000nicht|r verschoben - Inventar",
+    itemsNotMovedBank                     = "Objekt(e) |cFF0000nicht|r verschoben - Bank",
     
     --CRAFT
     --Types of craft

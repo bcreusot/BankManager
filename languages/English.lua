@@ -21,8 +21,11 @@ language.English = {
 
 	spamChatText						  = "Detailed Moved/Stacked items",
 	spamChatTooltip						  = "Display details of each item moved in chat",
-	spamChatAllText						  = "Hide Summary",
-	spamChatAllTextTooltip				  = "Hide the summary of the number of moved/stacked items",
+	spamChatAllText						  = "Display Summary",
+	spamChatAllTextTooltip				  = "Display the summary of the number of moved/stacked items\nDisplay amount of gold moved\nDisplay some usefull errors",
+
+	delayTransfer						  = "Delay Between moving items",
+	delayTransferTooltip				  = "Recommand : 0\nIt's time in millisec. This option is for people who experience crash when moving items too fast",
 
 	autoTransfert						  = "Enable Auto-Transfer",
 	autoTransferttooltip				  = "Enable Auto-Transfer of items when the bank is opened",
@@ -32,6 +35,28 @@ language.English = {
 	profile								  = "Profile",
 	defaultProfile						  = "Default Profile",
 	defaultProfileToolTip				  = "Default Profile when opening the bank if the Auto-Transfer is enabled",
+
+	goldHeader							  = "Gold",
+	autoGoldTransfer					  = "Enable the Auto Gold Transfer",
+	autoGoldTransferTooltip				  = "When the bank is open all the golden related operations will be performed",
+	goldButtonToolbar 					  = "[Toolbar] Display the gold button",
+	subMenuGoldRules 					  = "Gold Transfer Rules",
+	directionGoldTransfer				  = "Deposit/Withdraw",
+	typeOfGoldTransfer					  = "Type of gold transfer",
+	goldAmount							  = "Transfer by Amount",
+	goldPercentage						  = "Transfer by percentage",
+	amountGoldTransferInt				  = "Amount of Gold",
+	amountGoldTransferIntTooltip		  = "The amount of gold that will be transfered",
+	amountGoldTransferPerc				  = "Percentage of Gold",
+	amountGoldTransferPercTooltip		  = "The percentage of your gold that will be transfered",
+	minGoldKeep							  = "Minimum Gold",
+	minGoldKeepTooltip					  = "Set the Minimum gold to keep",
+	timeBetweenGoldTransfer				  = "Time(min) between consecutive transfer",
+	timeBetweenGoldTransferTooltip		  = "In case you set the automatic transfer and you speak two time in a row to the banker",
+	goldMoved							  = "Gold moved",
+	goldTimeNotReach					  = "minutes until gold can be transfered!",
+	notEnoughGold						  = "Not enough gold (check settings)",
+								
 	profileName							  = "Profile Name",
 	profileNameTooltip					  = "Set the profil name",
 	
@@ -57,6 +82,8 @@ language.English = {
 	noDisplayed							  = "messages not displayed",
 	itemsMoved							  = "item(s) moved",
 	itemsStacked						  = "item(s) stacked",
+	itemsNotMovedInv					  = "item(s) |cFF0000not|r moved - Inventory",
+	itemsNotMovedBank					  = "item(s) |cFF0000not|r moved - Bank",
 	
 	--CRAFT
 	--Types of craft

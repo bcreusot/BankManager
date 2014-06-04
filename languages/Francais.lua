@@ -21,8 +21,11 @@ language.Francais = {
 
 	spamChatText						  = "Affiche le detail",
 	spamChatTooltip						  = "Affiche les items deplacés dans le chat",
-	spamChatAllText						  = "Cache le sommaire",
-	spamChatAllTextTooltip				  = "Cache le sommaire montrant le nombre d'objets deplacés/stackés",
+	spamChatAllText						  = "Affiche le resumé",
+	spamChatAllTextTooltip				  = "Affiche le resumé montrant le nombre total d'objets deplacés/stackés\nAffiche l'or transferé\nAffiche certaines erreurs",
+
+	delayTransfer						  = "Temps entre deux transferts",
+	delayTransferTooltip				  = "Recommander : 0\nLe temps est en millisec. Cette option est pour les gens qui plantent quand le jeu deplace les objets trop vite",
 
 	autoTransfert						  = "Activer le transfert automatique",
 	autoTransferttooltip				  = "Activer le transfert automatique d'objets quand la banque s'ouvre",
@@ -32,6 +35,28 @@ language.Francais = {
 	profile								  = "Profil",
 	defaultProfile						  = "Profil par défaut",
 	defaultProfileToolTip				  = "Profil par défaut à l'ouverture de la banque si le Transfert Auto est activé",
+	
+	goldHeader							  = "Or",
+	autoGoldTransfer					  = "Activer le l'auto-transfert d'or",
+	autoGoldTransferTooltip				  = "Automatiquement quand la banque s'ouvre, transfert l'or en fonction des règles établies",
+	goldButtonToolbar 					  = "Affiche le bouton Or dans la toolbar",
+	subMenuGoldRules 					  = "Règles relatives à l'or",
+	directionGoldTransfer				  = "Sens du transfert d'or",
+	typeOfGoldTransfer					  = "Type de transfert",
+	goldAmount							  = "Par montant",
+	goldPercentage						  = "Par pourcentage",
+	amountGoldTransferInt				  = "Montant d'or",
+	amountGoldTransferIntTooltip		  = "Montant de l'or à transferer",
+	amountGoldTransferPerc				  = "Pourcentage de la fortune",
+	amountGoldTransferPercTooltip		  = "Pourcentage de la fortune arrondi à l'inférieur",
+	minGoldKeep							  = "Or minimum à garder",
+	minGoldKeepTooltip					  = "Minimum d'or qui restera toujours à la source",
+	timeBetweenGoldTransfer				  = "Temps(minutes) entre deux transferts",
+	timeBetweenGoldTransferTooltip		  = "Temps entre deux transferts en minutes",
+	goldMoved							  = "Or déplacé(s)",
+	goldTimeNotReach					  = "minutes avant le prochain transfert d'or!",
+	notEnoughGold						  = "pas assez d'or à transferer",
+
 	profileName							  = "Nom du profil",
 	profileNameTooltip					  = "Entrez le nom du profil",
 
@@ -58,6 +83,8 @@ language.Francais = {
 	noDisplayed							  = "non affiché(s)",
 	itemsMoved							  = "objet(s) deplacé(s)",
 	itemsStacked						  = "objet(s) stacké(s)",
+	itemsNotMovedInv					  = "objet(s) |cFF0000non|r deplacé(s) - Inventaire",
+	itemsNotMovedBank					  = "objet(s) |cFF0000non|r deplacé(s) - Banque",
 	
 	--CRAFT
 	--Types de filtres : craft

@@ -10,18 +10,30 @@ TEXTURE_PROFILE_BUTTON_PRESSED_2  = "BankManager/img/ProfilePressed_2.dds"
 TEXTURE_PROFILE_BUTTON_3		  = "BankManager/img/Profile_3.dds"
 TEXTURE_PROFILE_BUTTON_PRESSED_3  = "BankManager/img/ProfilePressed_3.dds"
 
+GOLD_BUTTON						  = "BankManager/img/Gold.dds"
+GOLD_BUTTON_PRESSED				  = "BankManager/img/GoldPressed.dds"
+
 FONT_TEXTURE 		  			  = "BankManager/img/font.dds"
 
 
 -----------------------
 -- BUTTON CODE
 -----------------------
-
+local GOLD   = {
+	id      		= "_GOLD",
+	tooltip 		= "goldHeader",
+	texture 		= GOLD_BUTTON,
+	texturePressed  = GOLD_BUTTON_PRESSED,
+	func    		= function ()
+			            moveGold()
+			        end
+}
 
 -----------------------
 -- TOOLBAR BUTTON LIST
 -----------------------
 local toolBarOptions ={
+
 }
 
 
@@ -47,9 +59,7 @@ local function createProfilesButtons()
 					            if not status then
 					                cleanAll(err)
 					            end
-					            d(subMenuBlackSmithingRulesBM1:IsHidden())
 					            subMenuBlackSmithingRulesBM1:SetHidden(true)
-					            d(subMenuBlackSmithingRulesBM1:IsHidden())
 					        end
 		}
 		table.insert(toolBarOptions,profile)
@@ -110,6 +120,10 @@ function InitializeGUI()
     texture:SetAnchorFill()
     texture:SetTexture(FONT_TEXTURE)
 
+    if BankManager.Saved["goldButtonToolbar"] then
+    	GOLD.tooltip = getTranslated(GOLD.tooltip)
+    	table.insert(toolBarOptions,GOLD)
+    end
     createProfilesButtons()
 
     for k,toolBarItem in pairs(toolBarOptions) do

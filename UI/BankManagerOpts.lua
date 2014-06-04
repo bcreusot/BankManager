@@ -103,6 +103,44 @@ local function setAllOptions(val,numProfile,arrayElements)
     end
 end
 
+local function createSubMenuGoldRules(lam,panelID)
+    lam:AddDropdown(panelID, "directionGoldTransfer", getTranslated("directionGoldTransfer"), "", getTranslateTable(directionGoldTransfer),
+        function() return getTranslated(BankManager.Saved["directionGoldTransfer"]) end,
+        function(val) changeTranslateTable(val,"directionGoldTransfer") end)
+    
+    lam:AddDropdown(panelID, "typeOfGoldTransferBM", getTranslated("typeOfGoldTransfer"), "", getTranslateTable(typeOfGoldTransfer),
+        function() return getTranslated(BankManager.Saved["typeOfGoldTransfer"]) end,
+        function(val)
+            changeTranslateTable(val,"typeOfGoldTransfer")
+            -- Check global vars
+            -- [1] : goldAmount
+            -- [2] : goldPercentage
+            if val == getTranslated(typeOfGoldTransfer[1]) then
+                amountInt:SetHidden(false)
+                amountPerc:SetHidden(true)
+            else
+                amountInt:SetHidden(true)
+                amountPerc:SetHidden(false)
+            end
+        end)
+
+    amountInt = lam:AddEditBox(panelID, "amountGoldTransferIntBM", getTranslated("amountGoldTransferInt"), getTranslated("amountGoldTransferIntTooltip"), false,
+        function() return BankManager.Saved["amountGoldTransferInt"] end,
+        function(val) BankManager.Saved["amountGoldTransferInt"] = val end)
+
+    amountPerc = lam:AddSlider(panelID, "amountGoldTransferPercBM", getTranslated("amountGoldTransferPerc"), getTranslated("amountGoldTransferPercTooltip"), 1, 100, 1,
+        function() return BankManager.Saved["amountGoldTransferPerc"] end,
+        function(val) BankManager.Saved["amountGoldTransferPerc"] = val end)
+
+    lam:AddEditBox(panelID, "minGoldKeepBM", getTranslated("minGoldKeep"), getTranslated("minGoldKeepTooltip"), false,
+        function() return BankManager.Saved["minGoldKeep"] end,
+        function(val) BankManager.Saved["minGoldKeep"] = val end)
+
+    lam:AddSlider(panelID, "timeBetweenGoldTransferBM", getTranslated("timeBetweenGoldTransfer"), getTranslated("timeBetweenGoldTransferTooltip"), 5, 300, 5,
+        --because it's minute related!
+        function() return BankManager.Saved["timeBetweenGoldTransfer"]/60 end,
+        function(val) BankManager.Saved["timeBetweenGoldTransfer"] = val*60 end)
+end
 
 local function createSubMenuStacksRules(lam,panelID,numProfile)
     lam:AddDropdown(panelID, "fillStacks#"..numProfile, getTranslated("fillStacks"), getTranslated("fillStacksTooltip"), getTranslateTable(sendingType),
@@ -249,10 +287,13 @@ function options()
             function() return BankManager.Saved["spamChat"] end,
             function(val) BankManager.Saved["spamChat"] = val end)
     
-    LAM:AddCheckbox(optionsPanel, "spamChatAllBM", getTranslated("spamChatAllText"), getTranslated("spamChatAllTooltip"),
+    LAM:AddCheckbox(optionsPanel, "spamChatAllBM", getTranslated("spamChatAllText"), getTranslated("spamChatAllTextTooltip"),
             function() return BankManager.Saved["spamChatAll"] end,
             function(val) BankManager.Saved["spamChatAll"] = val end)
 
+    LAM:AddSlider(optionsPanel, "delayTransferBM", getTranslated("delayTransfer"), getTranslated("delayTransferTooltip"), 0, 500, 25,
+        function() return BankManager.Saved["delayTransfer"] end,
+        function(val) BankManager.Saved["delayTransfer"] = val end)
 
     LAM:AddDropdown(optionsPanel, "profilesNbBM", getTranslated("profilesNb"), getTranslated("profilesNbTooltip"), getMaxProfilesNb(),
             function() return BankManager.Saved["profilesNb"] end,
@@ -263,6 +304,25 @@ function options()
     LAM:AddDropdown(optionsPanel, "defaultProfileBM", getTranslated("defaultProfile"), getTranslated("defaultProfileTooltip"), getProfilesNames(),
             function() return getProfileName(tonumber(BankManager.Saved["defaultProfile"]) <= tonumber(BankManager.Saved["profilesNb"]) and BankManager.Saved["defaultProfile"] or 1) end,
             setDefaultProfile)
+
+    -- GOLD MODE
+    LAM:AddHeader(optionsPanel, "headerGoldBM", "|c3366FF" .. getTranslated("goldHeader").."|r" )
+    LAM:AddCheckbox(optionsPanel, "autoGoldTransferBM", getTranslated("autoGoldTransfer"), getTranslated("autoGoldTransferTooltip"),
+            function() return BankManager.Saved["autoGoldTransfer"] end,
+            function(val) BankManager.Saved["autoGoldTransfer"] = val end)
+
+    LAM:AddCheckbox(optionsPanel, "goldButtonToolbarBM", getTranslated("goldButtonToolbar"), "",
+            function() return BankManager.Saved["goldButtonToolbar"] end,
+            function(val) 
+                BankManager.Saved["goldButtonToolbar"] = val
+                dirty = true
+                setReloadMessage()
+            end,
+            true , getTranslated("reloadWarning"))
+
+    local subMenuGoldRules = LAM:AddSubMenu(optionsPanel, "subMenuGoldRulesBM", getTranslated("subMenuGoldRules"), "")
+    createSubMenuGoldRules(LAM, subMenuGoldRules)
+
 
     --Profile Mode !
     for i=1,BankManager.Saved["profilesNb"] do

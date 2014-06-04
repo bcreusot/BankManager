@@ -17,11 +17,14 @@ function placeItems(fromBag, fromSlot, destBag, destSlot, quantity)
     --else
     --    d("(" .. fromName .. ")[" .. fromBag .. "," .. fromSlot .."] => (nil) [" .. destBag .. "," .. destSlot .."] (" .. quantity .. ")")
     --end
-    ClearCursor()
-    if CallSecureProtected("PickupInventoryItem", fromBag, fromSlot, quantity) then
-        CallSecureProtected("PlaceInInventory", destBag, destSlot)
-    end
-    ClearCursor()
+    zo_callLater(function() 
+        ClearCursor()
+        if CallSecureProtected("PickupInventoryItem", fromBag, fromSlot, quantity) then
+            CallSecureProtected("PlaceInInventory", destBag, destSlot)
+        end
+        ClearCursor()
+    end, delayTransfer)
+    delayTransfer = delayTransfer + BankManager.Saved["delayTransfer"]
 end
 
 ---------------------------------------------------------------------------------------
@@ -168,14 +171,15 @@ function moveItems(isPushSet,isPullSet,numProfile)
     --now it's performing :)
     flagAlreadyPerforming  = true
     currentProfile         = numProfile
-    local nbItemsMove,nbItemsStack                      = 0,0
-    local pushItems,pullItems                           = {},{}
-    local bankBag                                       = BANKS_TRANSLATION[BankManager.Saved.bankChoice]
-    local backpackBag                                   = BAG_BACKPACK
-    local bankItemsStackTable, bankFreeSlots            = {},{}
-    local inventoryItemsStackTable, inventoryFreeSlots  = {},{}
-    local securityCounter                               = 0
-    
+    delayTransfer          = 0
+    local nbItemsMoveToBank,nbItemsMoveToInv,nbItemsStack = 0,0,0
+    local pushItems,pullItems                             = {},{}
+    local bankBag                                         = BANKS_TRANSLATION[BankManager.Saved.bankChoice]
+    local backpackBag                                     = BAG_BACKPACK
+    local bankItemsStackTable, bankFreeSlots              = {},{}
+    local inventoryItemsStackTable, inventoryFreeSlots    = {},{}
+    local securityCounter                                 = 0
+
     --BANK ANALYZE
     bankItemsStackTable,bankFreeSlots = getBagDescription(bankBag,pushItems,pullItems)
     --INVENTORY ANALYZE
@@ -230,7 +234,7 @@ function moveItems(isPushSet,isPullSet,numProfile)
                     --new place in bank
                     table.insert(inventoryFreeSlots,item.slot)
                     pushItems[k] = nil
-                    nbItemsMove  = nbItemsMove + 1
+                    nbItemsMoveToBank  = nbItemsMoveToBank + 1
                     local argb = GetItemQualityColor(item.quality)
                     displayChat(item.name, item.stack, true,{argb.r,argb.g,argb.b})
                 --if not there is no point to continue
@@ -249,7 +253,7 @@ function moveItems(isPushSet,isPullSet,numProfile)
                     --new place in bank
                     table.insert(bankFreeSlots,item.slot)
                     pullItems[k] = nil
-                    nbItemsMove  = nbItemsMove + 1
+                    nbItemsMoveToInv  = nbItemsMoveToInv + 1
                     local argb = GetItemQualityColor(item.quality)
                     displayChat(item.name, item.stack, true,{argb.r,argb.g,argb.b})
                 else
@@ -268,14 +272,78 @@ function moveItems(isPushSet,isPullSet,numProfile)
     end
 
     if BankManager.Saved["spamChatAll"] then
-        d("----------------------")
-        d(nbItemsMove .. " " .. getTranslated("itemsMoved"))
         d(nbItemsStack .. " " .. getTranslated("itemsStacked"))
-        d("----------------------")
+        d((nbItemsMoveToInv + nbItemsMoveToBank) .. " " .. getTranslated("itemsMoved"))
+        if next(pushItems) ~= nil then
+            d(sizeArray(pushItems) .. " " .. getTranslated("itemsNotMovedInv"))
+        end
+        if next(pullItems) ~= nil then
+            d(sizeArray(pullItems) .. " " .. getTranslated("itemsNotMovedBank"))
+        end
+
     end
     --Data reset for new action
     counterMessageChat    = 0
     flagAlreadyPerforming = false
 end
 
+function sizeArray(arrayVar)
+    local i = 0
+    for k,v in pairs(arrayVar) do
+        i = i +1
+    end
+    return i
+end
 
+function moveGold()
+    --If the time between 2 gold transaction is not reach
+    local timeStampDiff = GetDiffBetweenTimeStamps(GetTimeStamp(), BankManager.Saved["timeLastDeposit"])
+    if timeStampDiff < tonumber(BankManager.Saved["timeBetweenGoldTransfer"]) then
+        if BankManager.Saved["spamChatAll"] then
+            timeStampDiff = (tonumber(BankManager.Saved["timeBetweenGoldTransfer"]) - timeStampDiff)/60
+            d(math.floor(timeStampDiff + 0.5) .. " " .. getTranslated("goldTimeNotReach"))
+        end
+        return
+    end
+
+    local currentGold = 0
+    local sendGold    = nil
+    local goldValue   = 0
+    
+    --Set up the direction of the transaction and all the related functions
+    if BankManager.Saved["directionGoldTransfer"] == INVENTORY_TO_BANK then
+        currentGold = GetCurrentMoney()
+        sendGold  = DepositMoneyIntoBank
+    else
+        currentGold = GetBankedMoney()
+        sendGold  = WithdrawMoneyFromBank
+    end
+
+    --Check if the currentGold owned is not under the gold limit
+    if currentGold <= BankManager.Saved["minGoldKeep"] then
+        d(getTranslated("notEnoughGold"))
+        return
+    end
+
+    --get the amount of gold that will be transfered - typeOfGoldTransfer[1] = "goldAmount"
+    if BankManager.Saved["typeOfGoldTransfer"] == typeOfGoldTransfer[1] then
+        goldValue = tonumber(BankManager.Saved["amountGoldTransferInt"])
+        if goldValue == nil then
+            return
+        end
+    else
+        goldValue = math.floor(tonumber(BankManager.Saved["amountGoldTransferPerc"])*currentGold/100 + 0.5)
+    end
+
+    --if there isn't enough gold above the min amount
+    if currentGold - goldValue < BankManager.Saved["minGoldKeep"] then
+        goldValue = currentGold - BankManager.Saved["minGoldKeep"]
+    end
+
+    BankManager.Saved["timeLastDeposit"] = GetTimeStamp()
+    sendGold(goldValue)
+
+    if BankManager.Saved["spamChatAll"] then
+        d(goldValue .. " " .. getTranslated("goldMoved"))
+    end
+end

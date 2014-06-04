@@ -6,7 +6,7 @@
 --
 --  * Benjamin Creusot - Todo
 --  * Creation : 17/04/2014 
---  * v2.8
+--  * v2.9
 --      Manage easily your bank. Automatically places items in your bank/inventory
 --
 --  * LICENSE MIT
@@ -27,12 +27,17 @@ function bankOpening(eventCode, addOnName, isManual)
     end
 
     --Display the toolbar
-    if BankManager.Saved.toolBarDisplayed then
+    if BankManager.Saved["toolBarDisplayed"] then
         showUI()
     end
 
+    --GOLD
+    if BankManager.Saved["autoGoldTransfer"] then
+        moveGold()
+    end
+
     -- if the automatique push/pull is disable
-    if not BankManager.Saved.autoTransfert then
+    if not BankManager.Saved["autoTransfert"] then
         return
     end
 
@@ -78,7 +83,6 @@ function cleanAll(err)
     assert(false,err)
 end
 
-
 ------------------------------------------------------------------------------------
 -- ** Function called when the options panel is close (EVENT_ACTION_LAYER_POPPED) **
 -- dirtyAndReloadUI(eventCode, layerIndex, activeLayerIndex)
@@ -114,6 +118,7 @@ function init(eventCode, addOnName)
         ["autoTransfert"]           = true,
         ["spamChat"]                = true,
         ["spamChatAll"]             = true,
+        ["delayTransfer"]           = 0,
         ["profilesNb"]              = 1,
         ["profilesNames"]           = {},
         ["defaultProfile"]          = 1,
@@ -122,12 +127,14 @@ function init(eventCode, addOnName)
         ["stackSizeCheckBox"]       = {},
         ["stackSizeSlider"]         = {},
         ["autoGoldTransfer"]        = false,
-        ["typeOfGoldTransfer"]      = typeOfGoldTransfer, 
+        ["goldButtonToolbar"]       = true,
+        ["directionGoldTransfer"]   = INVENTORY_TO_BANK,
+        ["typeOfGoldTransfer"]      = typeOfGoldTransfer[1], 
         ["amountGoldTransferInt"]   = 1000,
         ["amountGoldTransferPerc"]  = 10,
-        ["timeBetweenGoldTransfer"] = 10,
-        ["minGoldKeep"]             = 1000
-
+        ["minGoldKeep"]             = 1000,
+        ["timeBetweenGoldTransfer"] = 10*60,
+        ["timeLastDeposit"]         = 0
     }
     
     for i=1,maxProfilesNb do
@@ -146,6 +153,24 @@ function init(eventCode, addOnName)
     end
     BankManager.Saved = ZO_SavedVars:New(BankManagerVars, 3, nil, defaults, nil)
 
+    --mistake by me when I have pre-set the vars
+    if BankManager.Saved["typeOfGoldTransfer"] == nil or type(BankManager.Saved["typeOfGoldTransfer"]) == type({}) then
+        BankManager.Saved["typeOfGoldTransfer"] = typeOfGoldTransfer[1]
+    end
+    if BankManager.Saved["directionGoldTransfer"] == nil then
+        BankManager.Saved["directionGoldTransfer"] = INVENTORY_TO_BANK
+    end
+    if BankManager.Saved["goldButtonToolbar"] == nil then
+        BankManager.Saved["goldButtonToolbar"] = true
+    end
+    if BankManager.Saved["timeLastDeposit"] == nil then
+        BankManager.Saved["timeLastDeposit"] = 0
+    end
+    if BankManager.Saved["delayTransfer"] == nil then
+        BankManager.Saved["delayTransfer"] = 0
+    end
+
+
     --Later call of the option function to remove the anchor issue
     zo_callLater(function() options() end, 500)
     InitializeGUI()
@@ -158,6 +183,8 @@ function init(eventCode, addOnName)
     EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_OPEN_BANK              , bankOpening)
     EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_CLOSE_BANK             , bankClose)
     --EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_GUILD_BANK_ITEMS_READY, bankOpening)
+    
+    --EVENT_MANAGER:RegisterForEvent(BankManagerAppName, EVENT_PLAYER_ACTIVATED       , playerReady)
 
 end
 
