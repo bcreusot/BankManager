@@ -25,7 +25,7 @@ language.Francais = {
 	spamChatAllTextTooltip				  = "Affiche le resumé montrant le nombre total d'objets deplacés/stackés\nAffiche l'or transferé\nAffiche certaines erreurs",
 
 	delayTransfer						  = "Temps entre deux transferts",
-	delayTransferTooltip				  = "Recommander : 0\nLe temps est en millisec. Cette option est pour les gens qui plantent quand le jeu deplace les objets trop vite",
+	delayTransferTooltip				  = "Recommander : 0\nLe temps est en millisec\n Cette option est pour les gens qui plantent quand le jeu deplace les objets trop vite",
 
 	autoTransfert						  = "Activer le transfert automatique",
 	autoTransferttooltip				  = "Activer le transfert automatique d'objets quand la banque s'ouvre",

@@ -25,7 +25,7 @@ language.English = {
 	spamChatAllTextTooltip				  = "Display the summary of the number of moved/stacked items\nDisplay amount of gold moved\nDisplay some usefull errors",
 
 	delayTransfer						  = "Delay Between moving items",
-	delayTransferTooltip				  = "Recommand : 0\nIt's time in millisec. This option is for people who experience crash when moving items too fast",
+	delayTransferTooltip				  = "Recommand : 0\nIt's time in millisec\n This option is for people who experience crash when moving items too fast",
 
 	autoTransfert						  = "Enable Auto-Transfer",
 	autoTransferttooltip				  = "Enable Auto-Transfer of items when the bank is opened",
