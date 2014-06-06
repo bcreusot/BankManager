@@ -320,7 +320,7 @@ function moveGold()
     end
 
     --Check if the currentGold owned is not under the gold limit
-    if currentGold <= BankManager.Saved["minGoldKeep"] then
+    if currentGold <= tonumber(BankManager.Saved["minGoldKeep"]) then
         d(getTranslated("notEnoughGold"))
         return
     end
@@ -332,12 +332,12 @@ function moveGold()
             return
         end
     else
-        goldValue = math.floor(tonumber(BankManager.Saved["amountGoldTransferPerc"])*currentGold/100 + 0.5)
+        goldValue = math.floor(tonumber(tonumber(BankManager.Saved["amountGoldTransferPerc"]))*currentGold/100 + 0.5)
     end
 
     --if there isn't enough gold above the min amount
-    if currentGold - goldValue < BankManager.Saved["minGoldKeep"] then
-        goldValue = currentGold - BankManager.Saved["minGoldKeep"]
+    if currentGold - goldValue < tonumber(BankManager.Saved["minGoldKeep"]) then
+        goldValue = currentGold - tonumber(BankManager.Saved["minGoldKeep"])
     end
 
     BankManager.Saved["timeLastDeposit"] = GetTimeStamp()
