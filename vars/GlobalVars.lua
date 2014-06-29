@@ -2,7 +2,7 @@
  -- Global Vars
 BankManagerVars    = "BMVars"
 BankManagerAppName = "BankManager"
-currentVersion     = "v2.9"
+currentVersion     = "v2.9.1"
 
 -- Main Vars
 BankManager           = {}

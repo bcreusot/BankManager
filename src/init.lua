@@ -6,7 +6,7 @@
 --
 --  * Benjamin Creusot - Todo
 --  * Creation : 17/04/2014 
---  * v2.9
+--  * v2.9.1
 --      Manage easily your bank. Automatically places items in your bank/inventory
 --
 --  * LICENSE MIT
