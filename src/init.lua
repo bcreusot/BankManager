@@ -169,6 +169,18 @@ function init(eventCode, addOnName)
     if BankManager.Saved["delayTransfer"] == nil then
         BankManager.Saved["delayTransfer"] = 0
     end
+    if BankManager.Saved["ITEMTYPE_ENCHANTING_RUNE_ASPECT"] == nil then
+        BankManager.Saved["ITEMTYPE_ENCHANTING_RUNE_ASPECT"] = initVarFalse
+    end
+    if BankManager.Saved["ITEMTYPE_ENCHANTING_RUNE_ESSENCE"] == nil then
+        BankManager.Saved["ITEMTYPE_ENCHANTING_RUNE_ESSENCE"] = initVarFalse
+    end
+    if BankManager.Saved["ITEMTYPE_ENCHANTING_RUNE_POTENCY"] == nil then
+        BankManager.Saved["ITEMTYPE_ENCHANTING_RUNE_POTENCY"] = initVarFalse
+    end
+    if BankManager.Saved["ITEMTYPE_RACIAL_STYLE_MOTIF"] == nil then
+        BankManager.Saved["ITEMTYPE_RACIAL_STYLE_MOTIF"] = initVarFalse
+    end
 
 
     --Later call of the option function to remove the anchor issue
