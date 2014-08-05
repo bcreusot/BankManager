@@ -74,7 +74,7 @@ provisioningRules = {
     "ITEMTYPE_INGREDIENT",
     "ITEMTYPE_DRINK",
     "ITEMTYPE_FOOD",
-    "ITEMTYPE_RECIPE",
+    "ITEMTYPE_RECIPE"
 }
 enchantingRules = {
     "ITEMTYPE_ENCHANTING_RUNE_ASPECT",

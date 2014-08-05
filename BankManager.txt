@@ -1,8 +1,8 @@
-## Title: Bank Manager - By |c3366FF@Todo|r - 2.9
-## APIVersion: 100004
-## Version: 2.9
+## Title: Bank Manager - By |c3366FF@Todo|r - 2.9.3
+## APIVersion: 100007
+## Version: 2.9.3
 ## Author: Todo
-## Description: Manage easily your bank! 
+## Description: Manage your bank with ease! 2.9.3 patch by |c3366FFSnowmanDK|r
 ## SavedVariables: BMVars
 
 Libs/LibStub/LibStub.lua

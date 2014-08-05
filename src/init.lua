@@ -6,7 +6,7 @@
 --
 --  * Benjamin Creusot - Todo
 --  * Creation : 17/04/2014 
---  * v2.9
+--  * v2.9.1
 --      Manage easily your bank. Automatically places items in your bank/inventory
 --
 --  * LICENSE MIT
@@ -168,6 +168,18 @@ function init(eventCode, addOnName)
     end
     if BankManager.Saved["delayTransfer"] == nil then
         BankManager.Saved["delayTransfer"] = 0
+    end
+    if BankManager.Saved["ITEMTYPE_ENCHANTING_RUNE_ASPECT"] == nil then
+        BankManager.Saved["ITEMTYPE_ENCHANTING_RUNE_ASPECT"] = initVarFalse
+    end
+    if BankManager.Saved["ITEMTYPE_ENCHANTING_RUNE_ESSENCE"] == nil then
+        BankManager.Saved["ITEMTYPE_ENCHANTING_RUNE_ESSENCE"] = initVarFalse
+    end
+    if BankManager.Saved["ITEMTYPE_ENCHANTING_RUNE_POTENCY"] == nil then
+        BankManager.Saved["ITEMTYPE_ENCHANTING_RUNE_POTENCY"] = initVarFalse
+    end
+    if BankManager.Saved["ITEMTYPE_RACIAL_STYLE_MOTIF"] == nil then
+        BankManager.Saved["ITEMTYPE_RACIAL_STYLE_MOTIF"] = initVarFalse
     end
 
 
