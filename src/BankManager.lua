@@ -78,7 +78,7 @@ end
 --------------------------------------------------------------------------------------------------------------------
 local function getBagDescription(bag,pushItems,pullItems)
     --get the number of slot in the destination
-    local bagIcon, bagSlots = GetBagInfo(bag)
+    local bagSlots = GetBagSize(bag)
     --return tables of stackable items in the bag and free slots
     local itemsStackTable, slotAvalaibleDest = {},{}
     --iteration to get all the slots
